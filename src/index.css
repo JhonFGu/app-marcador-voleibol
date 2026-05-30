@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-digital: 'Orbitron', monospace;
+  
+  --color-orange-brand: #F97316;
+  --color-purple-brand: #A855F7;
+}
+
+/* Custom base styles */
+body {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Custom digital segment display effects */
+.digital-glow-orange {
+  text-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+}
+
+.digital-glow-purple {
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+
+.digital-glow-white {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+/* Prevent text selection during rapid scoring taps */
+.select-none {
+  user-select: none;
+  -webkit-user-select: none;
+}

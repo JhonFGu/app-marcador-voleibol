@@ -1,0 +1,78 @@
+import { useNavigate } from 'react-router-dom';
+import { Trophy, Play, ShieldAlert } from 'lucide-react';
+
+export default function Home() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="flex flex-col items-center justify-between min-h-[90vh] p-6 text-white select-none">
+      {/* Header / Brand */}
+      <div className="flex flex-col items-center mt-12 text-center">
+        <div className="relative mb-4 flex items-center justify-center w-20 h-20 bg-gradient-to-tr from-orange-brand to-purple-brand rounded-full shadow-lg">
+          {/* SVG Volleyball Icon */}
+          <svg className="w-12 h-12 text-white animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a10 10 0 0 0 4.5 18.5M12 22a10 10 0 0 0-4.5-18.5M2.5 9.5h19M2.5 14.5h19M12 2v20" />
+          </svg>
+        </div>
+        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
+          PuntosVolley
+        </h1>
+        <p className="text-sm font-semibold tracking-wider text-gray-400 uppercase mt-1">
+          powered by Cuervos Volley Club
+        </p>
+      </div>
+
+      {/* Main Options */}
+      <div className="flex flex-col w-full max-w-sm gap-6 my-auto">
+        {/* Simple Match Button */}
+        <button
+          onClick={() => navigate('/match/setup')}
+          className="flex items-center justify-between w-full p-5 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-orange-brand transition-all duration-300 active:scale-[0.98] group"
+        >
+          <div className="flex items-center gap-4 text-left">
+            <div className="p-3 rounded-xl bg-orange-brand/10 text-orange-brand group-hover:bg-orange-brand/20 transition-colors">
+              <Play className="w-6 h-6 fill-current" />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-white">Partido Simple</h3>
+              <p className="text-xs text-gray-400">Marcador rápido local sin cuenta</p>
+            </div>
+          </div>
+          <span className="text-orange-brand font-bold text-xl mr-2">→</span>
+        </button>
+
+        {/* Tournaments Button */}
+        <button
+          onClick={() => navigate('/tournaments')}
+          className="flex items-center justify-between w-full p-5 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-purple-brand transition-all duration-300 active:scale-[0.98] group"
+        >
+          <div className="flex items-center gap-4 text-left">
+            <div className="p-3 rounded-xl bg-purple-brand/10 text-purple-brand group-hover:bg-purple-brand/20 transition-colors">
+              <Trophy className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-bold text-lg text-white">Torneo / Club</h3>
+              <p className="text-xs text-gray-400">Partidos, tablas e historial en la nube</p>
+            </div>
+          </div>
+          <span className="text-purple-brand font-bold text-xl mr-2">→</span>
+        </button>
+      </div>
+
+      {/* Admin Panel Link */}
+      <div className="w-full max-w-sm">
+        <button
+          onClick={() => navigate('/admin/login')}
+          className="flex items-center justify-center gap-2 w-full py-3 bg-zinc-950 border border-zinc-900 rounded-xl text-xs font-semibold text-gray-400 hover:text-white hover:border-zinc-800 transition-all"
+        >
+          <ShieldAlert className="w-4 h-4" />
+          Acceso Administrador / Árbitro
+        </button>
+        <p className="text-[10px] text-center text-zinc-600 mt-4">
+          v1.0.0 • © 2026 Cuervos Volley Club. Todos los derechos reservados.
+        </p>
+      </div>
+    </div>
+  );
+}
