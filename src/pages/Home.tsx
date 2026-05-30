@@ -8,19 +8,19 @@ export default function Home() {
     <div className="flex flex-col items-center justify-between min-h-[90vh] p-6 text-white select-none">
       {/* Header / Brand */}
       <div className="flex flex-col items-center mt-12 text-center">
-        <div className="relative mb-4 flex items-center justify-center w-20 h-20 bg-gradient-to-tr from-orange-brand to-purple-brand rounded-full shadow-lg">
-          {/* SVG Volleyball Icon */}
-          <svg className="w-12 h-12 text-white animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 2a10 10 0 0 0 4.5 18.5M12 22a10 10 0 0 0-4.5-18.5M2.5 9.5h19M2.5 14.5h19M12 2v20" />
-          </svg>
-        </div>
         <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
           PuntosVolley
         </h1>
-        <p className="text-sm font-semibold tracking-wider text-gray-400 uppercase mt-1">
-          powered by Cuervos Volley Club
+        <p className="text-xs font-semibold tracking-wider text-gray-450 uppercase mt-1 mb-6 flex items-center gap-1 justify-center">
+          Creado con <span className="text-red-500 animate-pulse">❤️</span> por Cuervos Volley Club
         </p>
+        <div className="relative flex items-center justify-center w-24 h-24 bg-zinc-900/50 border border-zinc-800/80 rounded-2xl shadow-xl overflow-hidden p-1 bg-gradient-to-tr from-orange-brand/5 to-purple-brand/5">
+          <img 
+            src="/logo-club.png" 
+            alt="Cuervos Volley Club Logo" 
+            className="w-full h-full object-contain"
+          />
+        </div>
       </div>
 
       {/* Main Options */}
