@@ -320,9 +320,9 @@ export default function TournamentPlay() {
           Grupo {letter}
         </h4>
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
+          <table className="w-full text-left border-collapse text-sm whitespace-nowrap">
             <thead>
-              <tr className="text-zinc-550 font-bold border-b border-zinc-900 pb-1">
+              <tr className="text-zinc-550 font-bold border-b border-zinc-900 pb-1 text-sm">
                 <th className="py-2 pl-1">Equipo</th>
                 <th className="py-2 text-center">PTS</th>
                 <th className="py-2 text-center">PJ</th>
@@ -338,16 +338,16 @@ export default function TournamentPlay() {
                 const diff = row.pointsWon - row.pointsLost;
                 return (
                   <tr key={row.teamId} className="border-b border-zinc-900/40 last:border-0 hover:bg-zinc-900/10">
-                    <td className="py-2.5 pl-1 font-bold text-zinc-200 truncate max-w-[100px]">
+                    <td className="py-2.5 pl-1 font-bold text-zinc-200 truncate max-w-[100px] text-sm">
                       {idx + 1}. {row.teamName}
                     </td>
-                    <td className="py-2.5 text-center font-black text-orange-brand text-sm">{row.points}</td>
-                    <td className="py-2.5 text-center text-zinc-450">{row.played}</td>
-                    <td className="py-2.5 text-center text-emerald-400 font-semibold">{row.won}</td>
-                    <td className="py-2.5 text-center text-red-450 font-semibold">{row.lost}</td>
-                    <td className="py-2.5 text-center text-zinc-350">{row.pointsWon}</td>
-                    <td className="py-2.5 text-center text-zinc-350">{row.pointsLost}</td>
-                    <td className={`py-2.5 text-center font-bold ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-450' : 'text-zinc-450'}`}>
+                    <td className="py-2.5 text-center font-black text-orange-brand text-base">{row.points}</td>
+                    <td className="py-2.5 text-center text-zinc-450 text-sm">{row.played}</td>
+                    <td className="py-2.5 text-center text-emerald-400 font-semibold text-sm">{row.won}</td>
+                    <td className="py-2.5 text-center text-red-450 font-semibold text-sm">{row.lost}</td>
+                    <td className="py-2.5 text-center text-zinc-350 text-sm">{row.pointsWon}</td>
+                    <td className="py-2.5 text-center text-zinc-350 text-sm">{row.pointsLost}</td>
+                    <td className={`py-2.5 text-center font-bold text-sm ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-450' : 'text-zinc-450'}`}>
                       {diff > 0 ? `+${diff}` : diff}
                     </td>
                   </tr>
@@ -618,9 +618,9 @@ export default function TournamentPlay() {
                   Tabla General de la Liga
                 </h4>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
+                  <table className="w-full text-left border-collapse text-sm whitespace-nowrap">
                     <thead>
-                      <tr className="text-zinc-550 font-bold border-b border-zinc-900 pb-1">
+                      <tr className="text-zinc-550 font-bold border-b border-zinc-900 pb-1 text-sm">
                         <th className="py-2 pl-1">Pos</th>
                         <th className="py-2">Equipo</th>
                         <th className="py-2 text-center">PTS</th>
@@ -637,15 +637,15 @@ export default function TournamentPlay() {
                         const diff = row.pointsWon - row.pointsLost;
                         return (
                           <tr key={row.teamId} className="border-b border-zinc-900/40 last:border-0 hover:bg-zinc-900/10">
-                            <td className="py-2.5 pl-1 font-mono text-zinc-550">{idx + 1}</td>
-                            <td className="py-2.5 font-bold text-zinc-200 truncate max-w-[120px]">{row.teamName}</td>
-                            <td className="py-2.5 text-center font-black text-orange-brand text-sm">{row.points}</td>
-                            <td className="py-2.5 text-center text-zinc-450">{row.played}</td>
-                            <td className="py-2.5 text-center text-emerald-400 font-semibold">{row.won}</td>
-                            <td className="py-2.5 text-center text-red-450 font-semibold">{row.lost}</td>
-                            <td className="py-2.5 text-center text-zinc-350">{row.pointsWon}</td>
-                            <td className="py-2.5 text-center text-zinc-350">{row.pointsLost}</td>
-                            <td className={`py-2.5 text-center font-bold ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-450' : 'text-zinc-450'}`}>
+                            <td className="py-2.5 pl-1 font-mono text-zinc-555 text-sm">{idx + 1}</td>
+                            <td className="py-2.5 font-bold text-zinc-200 truncate max-w-[120px] text-sm">{row.teamName}</td>
+                            <td className="py-2.5 text-center font-black text-orange-brand text-base">{row.points}</td>
+                            <td className="py-2.5 text-center text-zinc-450 text-sm">{row.played}</td>
+                            <td className="py-2.5 text-center text-emerald-400 font-semibold text-sm">{row.won}</td>
+                            <td className="py-2.5 text-center text-red-450 font-semibold text-sm">{row.lost}</td>
+                            <td className="py-2.5 text-center text-zinc-350 text-sm">{row.pointsWon}</td>
+                            <td className="py-2.5 text-center text-zinc-350 text-sm">{row.pointsLost}</td>
+                            <td className={`py-2.5 text-center font-bold text-sm ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-450' : 'text-zinc-450'}`}>
                               {diff > 0 ? `+${diff}` : diff}
                             </td>
                           </tr>
@@ -658,9 +658,9 @@ export default function TournamentPlay() {
             )}
             
             {/* Table Legend/Glossary */}
-            <div className="p-4 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl text-[10px] text-zinc-500 leading-relaxed mt-2">
-              <span className="font-bold text-zinc-400 block mb-1">Abreviaturas de la tabla:</span>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            <div className="p-4 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl text-sm text-zinc-555 leading-relaxed mt-2">
+              <span className="font-bold text-zinc-400 block mb-1 text-sm">Abreviaturas de la tabla:</span>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                 <span><strong>PTS:</strong> Puntos ganados en la tabla</span>
                 <span><strong>PJ:</strong> Partidos Jugados</span>
                 <span><strong>PG:</strong> Partidos Ganados</span>
