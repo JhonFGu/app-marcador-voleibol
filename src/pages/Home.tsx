@@ -5,16 +5,16 @@ export default function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-[90vh] p-6 text-white select-none">
+    <div className="flex flex-col items-center justify-between min-h-[85vh] p-4 text-white select-none">
       {/* Header / Brand */}
-      <div className="flex flex-col items-center mt-12 text-center">
+      <div className="flex flex-col items-center mt-6 text-center">
         <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
           PuntosVolley
         </h1>
-        <p className="text-xs font-semibold tracking-wider text-gray-450 uppercase mt-1 mb-6 flex items-center gap-1 justify-center">
+        <p className="text-xs font-semibold tracking-wider text-gray-450 uppercase mt-1 mb-4 flex items-center gap-1 justify-center">
           Creado con <span className="text-red-500 animate-pulse">❤️</span> por Cuervos Volley Club
         </p>
-        <div className="relative flex items-center justify-center w-24 h-24 bg-zinc-900/50 border border-zinc-800/80 rounded-2xl shadow-xl overflow-hidden p-1 bg-gradient-to-tr from-orange-brand/5 to-purple-brand/5">
+        <div className="relative flex items-center justify-center w-36 h-36 bg-zinc-900/50 border border-zinc-800/80 rounded-3xl shadow-xl overflow-hidden p-1 bg-gradient-to-tr from-orange-brand/5 to-purple-brand/5">
           <img 
             src="/logo-club.png" 
             alt="Cuervos Volley Club Logo" 
