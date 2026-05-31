@@ -31,7 +31,7 @@ function App() {
   }, [checkUser, setSession]);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <div className="min-h-screen bg-black text-white selection:bg-purple-brand/30 selection:text-white">
         <Routes>
           <Route path="/" element={<Home />} />
