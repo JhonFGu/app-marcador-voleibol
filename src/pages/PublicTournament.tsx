@@ -287,32 +287,39 @@ export default function PublicTournament() {
           Grupo {letter}
         </h4>
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-[10px] whitespace-nowrap">
+          <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
             <thead>
-              <tr className="text-zinc-500 font-bold border-b border-zinc-900/60 pb-1">
+              <tr className="text-zinc-550 font-bold border-b border-zinc-900 pb-1">
                 <th className="py-2 pl-1">Equipo</th>
                 <th className="py-2 text-center">PTS</th>
                 <th className="py-2 text-center">PJ</th>
                 <th className="py-2 text-center">PG</th>
                 <th className="py-2 text-center">PP</th>
-                <th className="py-2 text-center">Sets (Ratio)</th>
+                <th className="py-2 text-center">PA</th>
+                <th className="py-2 text-center">PR</th>
+                <th className="py-2 text-center">DP</th>
               </tr>
             </thead>
             <tbody>
-              {groupRows.map((row, idx) => (
-                <tr key={row.teamId} className="border-b border-zinc-900/20 last:border-0 hover:bg-zinc-900/10">
-                  <td className="py-2 pl-1 font-bold text-zinc-200 truncate max-w-[100px]">
-                    {idx + 1}. {row.teamName}
-                  </td>
-                  <td className="py-2 text-center font-black text-orange-brand text-xs">{row.points}</td>
-                  <td className="py-2 text-center text-zinc-400">{row.played}</td>
-                  <td className="py-2 text-center text-emerald-400">{row.won}</td>
-                  <td className="py-2 text-center text-red-400">{row.lost}</td>
-                  <td className="py-2 text-center text-zinc-500 font-mono">
-                    {row.setsWon}-{row.setsLost} ({row.setsLost === 0 ? row.setsWon : (row.setsWon/row.setsLost).toFixed(2)})
-                  </td>
-                </tr>
-              ))}
+              {groupRows.map((row, idx) => {
+                const diff = row.pointsWon - row.pointsLost;
+                return (
+                  <tr key={row.teamId} className="border-b border-zinc-900/40 last:border-0 hover:bg-zinc-900/10">
+                    <td className="py-2.5 pl-1 font-bold text-zinc-200 truncate max-w-[100px]">
+                      {idx + 1}. {row.teamName}
+                    </td>
+                    <td className="py-2.5 text-center font-black text-orange-brand text-sm">{row.points}</td>
+                    <td className="py-2.5 text-center text-zinc-450">{row.played}</td>
+                    <td className="py-2.5 text-center text-emerald-400 font-semibold">{row.won}</td>
+                    <td className="py-2.5 text-center text-red-450 font-semibold">{row.lost}</td>
+                    <td className="py-2.5 text-center text-zinc-350">{row.pointsWon}</td>
+                    <td className="py-2.5 text-center text-zinc-350">{row.pointsLost}</td>
+                    <td className={`py-2.5 text-center font-bold ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-450' : 'text-zinc-450'}`}>
+                      {diff > 0 ? `+${diff}` : diff}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -562,37 +569,58 @@ export default function PublicTournament() {
                   Tabla General de la Liga
                 </h4>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-[10px] whitespace-nowrap">
+                  <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
                     <thead>
-                      <tr className="text-zinc-500 font-bold border-b border-zinc-900/60 pb-1">
+                      <tr className="text-zinc-550 font-bold border-b border-zinc-900 pb-1">
                         <th className="py-2 pl-1">Pos</th>
                         <th className="py-2">Equipo</th>
                         <th className="py-2 text-center">PTS</th>
                         <th className="py-2 text-center">PJ</th>
                         <th className="py-2 text-center">PG</th>
                         <th className="py-2 text-center">PP</th>
-                        <th className="py-2 text-center">Sets (Ratio)</th>
+                        <th className="py-2 text-center">PA</th>
+                        <th className="py-2 text-center">PR</th>
+                        <th className="py-2 text-center">DP</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {standings.map((row, idx) => (
-                        <tr key={row.teamId} className="border-b border-zinc-900/20 last:border-0 hover:bg-zinc-900/10">
-                          <td className="py-2 pl-1 font-mono text-zinc-500">{idx + 1}</td>
-                          <td className="py-2 font-bold text-zinc-200 truncate max-w-[120px]">{row.teamName}</td>
-                          <td className="py-2 text-center font-black text-orange-brand text-xs">{row.points}</td>
-                          <td className="py-2 text-center text-zinc-400">{row.played}</td>
-                          <td className="py-2 text-center text-emerald-400">{row.won}</td>
-                          <td className="py-2 text-center text-red-400">{row.lost}</td>
-                          <td className="py-2 text-center text-zinc-500 font-mono">
-                            {row.setsWon}-{row.setsLost} ({row.setsLost === 0 ? row.setsWon : (row.setsWon/row.setsLost).toFixed(2)})
-                          </td>
-                        </tr>
-                      ))}
+                      {standings.map((row, idx) => {
+                        const diff = row.pointsWon - row.pointsLost;
+                        return (
+                          <tr key={row.teamId} className="border-b border-zinc-900/40 last:border-0 hover:bg-zinc-900/10">
+                            <td className="py-2.5 pl-1 font-mono text-zinc-550">{idx + 1}</td>
+                            <td className="py-2.5 font-bold text-zinc-200 truncate max-w-[120px]">{row.teamName}</td>
+                            <td className="py-2.5 text-center font-black text-orange-brand text-sm">{row.points}</td>
+                            <td className="py-2.5 text-center text-zinc-450">{row.played}</td>
+                            <td className="py-2.5 text-center text-emerald-400 font-semibold">{row.won}</td>
+                            <td className="py-2.5 text-center text-red-450 font-semibold">{row.lost}</td>
+                            <td className="py-2.5 text-center text-zinc-350">{row.pointsWon}</td>
+                            <td className="py-2.5 text-center text-zinc-350">{row.pointsLost}</td>
+                            <td className={`py-2.5 text-center font-bold ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-450' : 'text-zinc-450'}`}>
+                              {diff > 0 ? `+${diff}` : diff}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
               </div>
             )}
+            
+            {/* Table Legend/Glossary */}
+            <div className="p-4 bg-zinc-950/40 border border-zinc-900/80 rounded-2xl text-[10px] text-zinc-500 leading-relaxed mt-2">
+              <span className="font-bold text-zinc-400 block mb-1">Abreviaturas de la tabla:</span>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                <span><strong>PTS:</strong> Puntos ganados en la tabla</span>
+                <span><strong>PJ:</strong> Partidos Jugados</span>
+                <span><strong>PG:</strong> Partidos Ganados</span>
+                <span><strong>PP:</strong> Partidos Perdidos</span>
+                <span><strong>PA:</strong> Puntos Anotados (Puntos a favor)</span>
+                <span><strong>PR:</strong> Puntos Recibidos (Puntos en contra)</span>
+                <span className="col-span-2"><strong>DP:</strong> Diferencia de Puntos (PA - PR)</span>
+              </div>
+            </div>
           </div>
         )}
 

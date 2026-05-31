@@ -10,7 +10,7 @@ export default function MatchSetup() {
   const [team1Name, setTeam1Name] = useState('Local');
   const [team2Name, setTeam2Name] = useState('Visitante');
   const [setsToWin, setSetsToWin] = useState<number>(2); // Best of 3
-  const [regularPoints, setRegularPoints] = useState<number>(25);
+  const [regularPoints, setRegularPoints] = useState<number>(9);
   const [tiebreakPoints, setTiebreakPoints] = useState<number>(5); // default to 5 points
   const [modality, setModality] = useState<MatchModality>('6v6');
   const [overtimeMode, setOvertimeMode] = useState<'con_alargue' | 'a_muerte'>('con_alargue');
@@ -141,11 +141,11 @@ export default function MatchSetup() {
                 onChange={(e) => setRegularPoints(Number(e.target.value))}
                 className="px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-orange-brand"
               >
-                <option value={25}>25 puntos</option>
-                <option value={21}>21 puntos</option>
-                <option value={15}>15 puntos</option>
-                <option value={11}>11 puntos</option>
                 <option value={9}>9 puntos</option>
+                <option value={11}>11 puntos</option>
+                <option value={15}>15 puntos</option>
+                <option value={21}>21 puntos</option>
+                <option value={25}>25 puntos</option>
               </select>
             </div>
 

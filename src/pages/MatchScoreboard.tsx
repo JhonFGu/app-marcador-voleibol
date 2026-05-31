@@ -327,9 +327,9 @@ export default function MatchScoreboard() {
             </div>
             <div
               onClick={() => handleScoreTap(leftTeamKey)}
-              className="w-full max-w-[200px] aspect-[4/3] flex items-center justify-center bg-white/10 border border-white/20 rounded-2xl cursor-pointer hover:border-white/50 transition-all select-none shadow-2xl active:scale-[0.97]"
+              className="w-full max-w-[240px] aspect-[4/3] flex items-center justify-center bg-white/10 border border-white/20 rounded-2xl cursor-pointer hover:border-white/50 transition-all select-none shadow-2xl active:scale-[0.97]"
             >
-              <span className="font-digital text-8xl md:text-9xl leading-none text-white font-bold select-none digital-glow-white">
+              <span className="font-digital text-9xl md:text-[10rem] lg:text-[12rem] leading-none text-white font-bold select-none digital-glow-white">
                 {leftScore.toString().padStart(2, '0')}
               </span>
             </div>
@@ -405,9 +405,9 @@ export default function MatchScoreboard() {
             </div>
             <div
               onClick={() => handleScoreTap(rightTeamKey)}
-              className="w-full max-w-[200px] aspect-[4/3] flex items-center justify-center bg-white/10 border border-white/20 rounded-2xl cursor-pointer hover:border-white/50 transition-all select-none shadow-2xl active:scale-[0.97]"
+              className="w-full max-w-[240px] aspect-[4/3] flex items-center justify-center bg-white/10 border border-white/20 rounded-2xl cursor-pointer hover:border-white/50 transition-all select-none shadow-2xl active:scale-[0.97]"
             >
-              <span className="font-digital text-8xl md:text-9xl leading-none text-white font-bold select-none digital-glow-purple">
+              <span className="font-digital text-9xl md:text-[10rem] lg:text-[12rem] leading-none text-white font-bold select-none digital-glow-purple">
                 {rightScore.toString().padStart(2, '0')}
               </span>
             </div>
@@ -451,9 +451,9 @@ export default function MatchScoreboard() {
               {/* Tappable score card */}
               <div
                 onClick={() => handleScoreTap(leftTeamKey)}
-                className="w-full aspect-square max-h-[140px] flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
+                className="w-full aspect-square max-h-[185px] flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
               >
-                <span className="font-digital text-6xl xs:text-7xl font-bold text-white select-none digital-glow-white">
+                <span className="font-digital text-8xl xs:text-9xl font-bold text-white select-none digital-glow-white">
                   {leftScore.toString().padStart(2, '0')}
                 </span>
               </div>
@@ -496,9 +496,9 @@ export default function MatchScoreboard() {
               {/* Tappable score card */}
               <div
                 onClick={() => handleScoreTap(rightTeamKey)}
-                className="w-full aspect-square max-h-[140px] flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
+                className="w-full aspect-square max-h-[185px] flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
               >
-                <span className="font-digital text-6xl xs:text-7xl font-bold text-white select-none digital-glow-white">
+                <span className="font-digital text-8xl xs:text-9xl font-bold text-white select-none digital-glow-white">
                   {rightScore.toString().padStart(2, '0')}
                 </span>
               </div>

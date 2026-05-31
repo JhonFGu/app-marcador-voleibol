@@ -430,12 +430,32 @@ export default function RefScoreboard() {
           </div>
 
           {/* Giant Score */}
-          <div className="my-auto text-center pointer-events-none flex flex-col justify-center">
-            <span className="text-9xl font-black font-mono text-white tracking-tighter block leading-none digital-glow-white">
+          <div className="my-auto text-center flex flex-col justify-center items-center">
+            <span className="text-9xl font-black font-mono text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
               {leftScore.toString().padStart(2, '0')}
             </span>
-            <span className="text-[10px] uppercase font-extrabold text-white/80 mt-1 block">
-              Toca para sumar punto
+            
+            {/* Quick point adjustment buttons */}
+            <div className="flex items-center justify-center gap-6 mt-4 w-full max-w-[160px]" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => {
+                  playAudio('beep');
+                  subPoint(leftTeamKey);
+                }}
+                disabled={leftScore === 0}
+                className="w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+              >
+                -
+              </button>
+              <button
+                onClick={() => handleScoreTap(leftTeamKey)}
+                className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+              >
+                +
+              </button>
+            </div>
+            <span className="text-[9px] uppercase font-bold text-white/70 mt-2 block pointer-events-none">
+              Toca la tarjeta para sumar
             </span>
           </div>
 
@@ -478,12 +498,32 @@ export default function RefScoreboard() {
           </div>
 
           {/* Giant Score */}
-          <div className="my-auto text-center pointer-events-none flex flex-col justify-center">
-            <span className="text-9xl font-black font-mono text-white tracking-tighter block leading-none digital-glow-white">
+          <div className="my-auto text-center flex flex-col justify-center items-center">
+            <span className="text-9xl font-black font-mono text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
               {rightScore.toString().padStart(2, '0')}
             </span>
-            <span className="text-[10px] uppercase font-extrabold text-white/80 mt-1 block">
-              Toca para sumar punto
+            
+            {/* Quick point adjustment buttons */}
+            <div className="flex items-center justify-center gap-6 mt-4 w-full max-w-[160px]" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => {
+                  playAudio('beep');
+                  subPoint(rightTeamKey);
+                }}
+                disabled={rightScore === 0}
+                className="w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+              >
+                -
+              </button>
+              <button
+                onClick={() => handleScoreTap(rightTeamKey)}
+                className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+              >
+                +
+              </button>
+            </div>
+            <span className="text-[9px] uppercase font-bold text-white/70 mt-2 block pointer-events-none">
+              Toca la tarjeta para sumar
             </span>
           </div>
 
