@@ -21,6 +21,7 @@ export default function MatchScoreboard() {
   const [timeoutCountdown, setTimeoutCountdown] = useState<number | null>(null);
   const [timeoutTeam, setTimeoutTeam] = useState<'team1' | 'team2' | null>(null);
   const [showConfirmReset, setShowConfirmReset] = useState(false);
+  const [showRotations, setShowRotations] = useState(false);
   
   // Track landscape/portrait state dynamically for optimized layouts
   const [isLandscape, setIsLandscape] = useState(window.innerWidth > window.innerHeight);
@@ -451,31 +452,39 @@ export default function MatchScoreboard() {
               {/* Tappable score card */}
               <div
                 onClick={() => handleScoreTap(leftTeamKey)}
-                className="w-full aspect-square max-h-[185px] flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
+                className="w-full h-44 xs:h-52 flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
               >
-                <span className="font-digital text-8xl xs:text-9xl font-bold text-white select-none digital-glow-white">
+                <span className="font-digital text-[6.5rem] xs:text-[8rem] font-bold text-white select-none leading-none tracking-tighter digital-glow-white">
                   {leftScore.toString().padStart(2, '0')}
                 </span>
               </div>
 
               {/* Score adjustments and timeouts */}
-              <div className="flex flex-col items-center w-full gap-2 mt-3">
-                <button
-                  onClick={() => {
-                    playAudio('beep');
-                    subPoint(leftTeamKey);
-                  }}
-                  disabled={leftScore === 0}
-                  className="w-full py-1 rounded-lg bg-white/15 border border-white/25 text-[10px] font-bold text-white hover:bg-white/25 disabled:opacity-30"
-                >
-                  - Restar
-                </button>
+              <div className="flex flex-col items-center w-full gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-center gap-4 w-full">
+                  <button
+                    onClick={() => {
+                      playAudio('beep');
+                      subPoint(leftTeamKey);
+                    }}
+                    disabled={leftScore === 0}
+                    className="w-11 h-11 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={() => handleScoreTap(leftTeamKey)}
+                    className="w-11 h-11 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+                  >
+                    +
+                  </button>
+                </div>
                 <button
                   onClick={() => handleTimeoutClick(leftTeamKey)}
                   disabled={leftTimeouts >= 2}
-                  className="text-[9px] font-bold text-white/80 hover:text-white disabled:opacity-30"
+                  className="text-sm font-bold text-white/80 hover:text-white disabled:opacity-30 mt-1"
                 >
-                  Pedir Tiempo ({leftTimeouts}/2)
+                  Tiempo ({leftTimeouts}/2)
                 </button>
               </div>
             </div>
@@ -496,43 +505,51 @@ export default function MatchScoreboard() {
               {/* Tappable score card */}
               <div
                 onClick={() => handleScoreTap(rightTeamKey)}
-                className="w-full aspect-square max-h-[185px] flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
+                className="w-full h-44 xs:h-52 flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
               >
-                <span className="font-digital text-8xl xs:text-9xl font-bold text-white select-none digital-glow-white">
+                <span className="font-digital text-[6.5rem] xs:text-[8rem] font-bold text-white select-none leading-none tracking-tighter digital-glow-white">
                   {rightScore.toString().padStart(2, '0')}
                 </span>
               </div>
 
               {/* Score adjustments and timeouts */}
-              <div className="flex flex-col items-center w-full gap-2 mt-3">
-                <button
-                  onClick={() => {
-                    playAudio('beep');
-                    subPoint(rightTeamKey);
-                  }}
-                  disabled={rightScore === 0}
-                  className="w-full py-1 rounded-lg bg-white/15 border border-white/25 text-[10px] font-bold text-white hover:bg-white/25 disabled:opacity-30"
-                >
-                  - Restar
-                </button>
+              <div className="flex flex-col items-center w-full gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-center gap-4 w-full">
+                  <button
+                    onClick={() => {
+                      playAudio('beep');
+                      subPoint(rightTeamKey);
+                    }}
+                    disabled={rightScore === 0}
+                    className="w-11 h-11 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={() => handleScoreTap(rightTeamKey)}
+                    className="w-11 h-11 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+                  >
+                    +
+                  </button>
+                </div>
                 <button
                   onClick={() => handleTimeoutClick(rightTeamKey)}
                   disabled={rightTimeouts >= 2}
-                  className="text-[9px] font-bold text-white/80 hover:text-white disabled:opacity-30"
+                  className="text-sm font-bold text-white/80 hover:text-white disabled:opacity-30 mt-1"
                 >
-                  Pedir Tiempo ({rightTimeouts}/2)
+                  Tiempo ({rightTimeouts}/2)
                 </button>
+              </div>
             </div>
           </div>
-        </div>
 
           {/* Sets and History display in a compact horizontal bar */}
           <div className="flex items-center justify-between bg-zinc-950/60 border border-zinc-900/80 p-3 rounded-xl gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">SETS:</span>
+              <span className="text-sm text-zinc-550 font-bold uppercase tracking-wider">SETS:</span>
               <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-850 px-2.5 py-1 rounded-lg">
                 <span className="font-digital text-sm font-black text-orange-brand">{leftSets}</span>
-                <span className="text-zinc-600 text-xs font-bold">:</span>
+                <span className="text-zinc-650 text-xs font-bold">:</span>
                 <span className="font-digital text-sm font-black text-purple-brand">{rightSets}</span>
               </div>
             </div>
@@ -541,7 +558,7 @@ export default function MatchScoreboard() {
             {setHistory.length > 0 && (
               <div className="flex items-center gap-1.5 overflow-x-auto max-w-[60%]">
                 {setHistory.map((score, idx) => (
-                  <span key={idx} className="text-[10px] bg-zinc-900 border border-zinc-850 px-2 py-0.5 rounded text-zinc-400 font-mono shrink-0">
+                  <span key={idx} className="text-sm bg-zinc-900 border border-zinc-850 px-2 py-0.5 rounded text-zinc-400 font-mono shrink-0">
                     S{idx + 1}: {swappedSides ? score.team2Points : score.team1Points}-{swappedSides ? score.team1Points : score.team2Points}
                   </span>
                 ))}
@@ -555,11 +572,21 @@ export default function MatchScoreboard() {
             <button onClick={redo} className="p-2 bg-zinc-900 border border-zinc-850 rounded-xl hover:text-white text-zinc-400"><Redo className="w-4.5 h-4.5" /></button>
             <button onClick={swapSides} className="p-2 bg-zinc-900 border border-zinc-850 rounded-xl hover:text-white text-zinc-400"><ArrowLeftRight className="w-4.5 h-4.5" /></button>
             <button
+              onClick={() => setShowRotations(!showRotations)}
+              className={`px-3 py-2 border rounded-xl text-xs font-bold transition-all ${
+                showRotations 
+                  ? 'bg-orange-brand/20 border-orange-brand text-orange-brand' 
+                  : 'bg-zinc-900 border-zinc-850 text-gray-450 hover:text-white'
+              }`}
+            >
+              Rotación {showRotations ? '▼' : '▲'}
+            </button>
+            <button
               onClick={() => {
                 playAudio('beep');
                 setServe(servingTeam === 'team1' ? 'team2' : 'team1');
               }}
-              className="px-3 py-2 bg-zinc-900 border border-zinc-850 rounded-xl text-xs font-bold text-gray-400"
+              className="px-3 py-2 bg-zinc-900 border border-zinc-850 rounded-xl text-xs font-bold text-gray-450 hover:text-white"
             >
               SAQUE
             </button>
@@ -568,7 +595,7 @@ export default function MatchScoreboard() {
       )}
 
       {/* 3. ROTATIONS COURT GRID (ONLY FOR 6v6) */}
-      {renderCourtGrid()}
+      {showRotations && renderCourtGrid()}
 
       {/* BOTTOM ACTION BAR */}
       <div className="mt-auto p-4 border-t border-zinc-900 bg-zinc-950 flex items-center justify-around">

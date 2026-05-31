@@ -24,6 +24,7 @@ export default function PublicLiveMatch() {
   const [loading, setLoading] = useState(true);
   const [matchData, setMatchData] = useState<MatchData | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [showRotations, setShowRotations] = useState(false);
 
   // References to track previous scores for sound trigger comparisons
   const prevScores = useRef<{ score1: number; score2: number; sets1: number; sets2: number }>({
@@ -343,7 +344,7 @@ export default function PublicLiveMatch() {
           </div>
 
           <div className="my-auto text-center flex flex-col justify-center">
-            <span className="text-9xl font-black font-mono text-white tracking-tighter block leading-none digital-glow-white">
+            <span className="text-[7.5rem] xs:text-[9.5rem] sm:text-[11rem] md:text-[13rem] font-bold font-digital text-white tracking-tighter block leading-none digital-glow-white">
               {currentSet.team1.toString().padStart(2, '0')}
             </span>
           </div>
@@ -373,7 +374,7 @@ export default function PublicLiveMatch() {
           </div>
 
           <div className="my-auto text-center flex flex-col justify-center">
-            <span className="text-9xl font-black font-mono text-white tracking-tighter block leading-none digital-glow-white">
+            <span className="text-[7.5rem] xs:text-[9.5rem] sm:text-[11rem] md:text-[13rem] font-bold font-digital text-white tracking-tighter block leading-none digital-glow-white">
               {currentSet.team2.toString().padStart(2, '0')}
             </span>
           </div>
@@ -392,7 +393,7 @@ export default function PublicLiveMatch() {
       </div>
 
       {/* 4. CANCHA rotation layout */}
-      {renderCourtGrid()}
+      {showRotations && renderCourtGrid()}
 
       {/* 5. BOTTOM SPECTATOR TOOLBAR */}
       <div className="px-4 py-3 border-t border-zinc-900 bg-zinc-950/60 flex items-center justify-between gap-2 z-10">
@@ -401,12 +402,25 @@ export default function PublicLiveMatch() {
           Sincronizado en tiempo real
         </span>
 
-        <button 
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          className="p-2.5 bg-zinc-900 border border-zinc-850 text-zinc-450 hover:text-zinc-200 rounded-xl transition-colors"
-        >
-          {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button 
+            onClick={() => setShowRotations(!showRotations)}
+            className={`px-3 py-2 border rounded-xl text-xs font-bold transition-all ${
+              showRotations 
+                ? 'bg-orange-brand/20 border-orange-brand text-orange-brand' 
+                : 'bg-zinc-900 border-zinc-850 text-gray-450 hover:text-white'
+            }`}
+          >
+            Rotación {showRotations ? '▼' : '▲'}
+          </button>
+          
+          <button 
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className="p-2.5 bg-zinc-900 border border-zinc-850 text-zinc-450 hover:text-zinc-200 rounded-xl transition-colors"
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
       {/* MODAL: TIMEOUT COUNTDOWN */}

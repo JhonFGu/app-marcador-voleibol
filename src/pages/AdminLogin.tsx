@@ -87,8 +87,8 @@ export default function AdminLogin() {
           <ArrowLeft className="w-5 h-5 text-gray-300" />
         </button>
         <div>
-          <h2 className="text-xl font-bold">Panel Admin</h2>
-          <p className="text-xs text-gray-400">Acceso restringido</p>
+          <h2 className="text-[22px] font-extrabold">Panel Admin</h2>
+          <p className="text-sm text-gray-400">Acceso restringido</p>
         </div>
       </div>
 
@@ -104,7 +104,7 @@ export default function AdminLogin() {
               <ShieldAlert className="w-8 h-8" />
             </div>
             <h3 className="text-lg font-bold text-white">Ingreso Administrador</h3>
-            <p className="text-xs text-gray-400 mt-1">Gestiona torneos, partidos y marcadores oficiales.</p>
+            <p className="text-sm text-gray-450 mt-1">Gestiona torneos, partidos y marcadores oficiales.</p>
           </div>
 
           {/* Custom Tabs */}
@@ -115,7 +115,7 @@ export default function AdminLogin() {
                 setErrorMsg(null);
                 setSuccessMsg(null);
               }}
-              className={`py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`py-2 text-base font-bold rounded-lg transition-all ${
                 activeTab === 'login'
                   ? 'bg-zinc-800 text-orange-brand border border-orange-brand/10'
                   : 'text-gray-400 hover:text-white'
@@ -129,7 +129,7 @@ export default function AdminLogin() {
                 setErrorMsg(null);
                 setSuccessMsg(null);
               }}
-              className={`py-2 text-xs font-bold rounded-lg transition-all ${
+              className={`py-2 text-base font-bold rounded-lg transition-all ${
                 activeTab === 'register'
                   ? 'bg-zinc-800 text-purple-brand border border-purple-brand/10'
                   : 'text-gray-400 hover:text-white'
@@ -141,12 +141,12 @@ export default function AdminLogin() {
 
           {/* Notification Messages */}
           {errorMsg && (
-            <div className="p-3 mb-4 rounded-xl bg-red-950/40 border border-red-900/50 text-xs text-red-400 font-semibold leading-relaxed">
+            <div className="p-3 mb-4 rounded-xl bg-red-950/40 border border-red-900/50 text-sm text-red-400 font-semibold leading-relaxed">
               ⚠️ {errorMsg}
             </div>
           )}
           {successMsg && (
-            <div className="p-3 mb-4 rounded-xl bg-emerald-950/40 border border-emerald-900/50 text-xs text-emerald-400 font-semibold leading-relaxed">
+            <div className="p-3 mb-4 rounded-xl bg-emerald-950/40 border border-emerald-900/50 text-sm text-emerald-400 font-semibold leading-relaxed">
               ✅ {successMsg}
             </div>
           )}
@@ -155,7 +155,7 @@ export default function AdminLogin() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {/* Email Field */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Correo Electrónico</label>
+              <label className="text-sm uppercase font-bold text-gray-400 tracking-wider">Correo Electrónico</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -mt-2 w-4 h-4 text-zinc-500" />
                 <input
@@ -164,14 +164,14 @@ export default function AdminLogin() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ejemplo@correo.com"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/40 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-orange-brand transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/40 border border-zinc-800 rounded-xl text-base focus:outline-none focus:border-orange-brand transition-colors"
                 />
               </div>
             </div>
 
             {/* Password Field */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Contraseña</label>
+              <label className="text-sm uppercase font-bold text-gray-400 tracking-wider">Contraseña</label>
               <div className="relative">
                 <KeyRound className="absolute left-3 top-1/2 -mt-2 w-4 h-4 text-zinc-500" />
                 <input
@@ -180,7 +180,7 @@ export default function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/40 border border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-purple-brand transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/40 border border-zinc-800 rounded-xl text-base focus:outline-none focus:border-purple-brand transition-colors"
                 />
               </div>
             </div>
@@ -189,13 +189,13 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`flex items-center justify-center gap-2 w-full py-3 mt-2 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-bold rounded-xl text-xs hover:opacity-95 transition-all active:scale-[0.98] ${
+              className={`flex items-center justify-center gap-2 w-full py-3.5 mt-2 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-bold rounded-xl text-base hover:opacity-95 transition-all active:scale-[0.98] ${
                 isSubmitting ? 'opacity-70 pointer-events-none' : ''
               }`}
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4.5 h-4.5 animate-spin" />
                   Procesando...
                 </>
               ) : activeTab === 'login' ? (

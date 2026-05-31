@@ -24,6 +24,7 @@ export default function RefScoreboard() {
   const [timeoutCountdown, setTimeoutCountdown] = useState<number | null>(null);
   const [timeoutTeam, setTimeoutTeam] = useState<'team1' | 'team2' | null>(null);
   const [showConfirmReset, setShowConfirmReset] = useState(false);
+  const [showRotations, setShowRotations] = useState(false);
   const [loading, setLoading] = useState(true);
   const [tournamentId, setTournamentId] = useState<string | null>(null);
   const [courtNumber, setCourtNumber] = useState<number>(1);
@@ -431,7 +432,7 @@ export default function RefScoreboard() {
 
           {/* Giant Score */}
           <div className="my-auto text-center flex flex-col justify-center items-center">
-            <span className="text-9xl font-black font-mono text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
+            <span className="text-[7.5rem] xs:text-[9.5rem] sm:text-[11rem] md:text-[13rem] font-bold font-digital text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
               {leftScore.toString().padStart(2, '0')}
             </span>
             
@@ -499,7 +500,7 @@ export default function RefScoreboard() {
 
           {/* Giant Score */}
           <div className="my-auto text-center flex flex-col justify-center items-center">
-            <span className="text-9xl font-black font-mono text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
+            <span className="text-[7.5rem] xs:text-[9.5rem] sm:text-[11rem] md:text-[13rem] font-bold font-digital text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
               {rightScore.toString().padStart(2, '0')}
             </span>
             
@@ -551,7 +552,7 @@ export default function RefScoreboard() {
       </div>
 
       {/* 4. CANCHA rotation layout */}
-      {renderCourtGrid()}
+      {showRotations && renderCourtGrid()}
 
       {/* 5. BOTTOM ACTIONS TOOLBAR */}
       <div className="px-4 py-3 border-t border-zinc-900 bg-zinc-950/60 flex items-center justify-between gap-2 z-10">
@@ -576,6 +577,17 @@ export default function RefScoreboard() {
             title="Cambiar de Lado"
           >
             <ArrowLeftRight className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={() => setShowRotations(!showRotations)}
+            className={`p-2.5 border rounded-xl text-xs font-bold transition-all ${
+              showRotations
+                ? 'bg-orange-brand/20 border-orange-brand text-orange-brand'
+                : 'bg-zinc-900 border-zinc-850 text-gray-400 hover:text-white'
+            }`}
+            title="Mostrar Rotaciones"
+          >
+            Rotación {showRotations ? '▼' : '▲'}
           </button>
         </div>
 
