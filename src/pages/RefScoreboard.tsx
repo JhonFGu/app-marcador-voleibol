@@ -29,6 +29,16 @@ export default function RefScoreboard() {
   const [tournamentId, setTournamentId] = useState<string | null>(null);
   const [courtNumber, setCourtNumber] = useState<number>(1);
 
+  const [isLandscape, setIsLandscape] = useState(window.innerWidth > window.innerHeight);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Duration Timer Interval
   useEffect(() => {
     const interval = setInterval(() => {
@@ -413,143 +423,268 @@ export default function RefScoreboard() {
       </div>
 
       {/* 3. SCOREBOARD PANELS AREA */}
-      <div className="flex-grow grid grid-cols-2 relative">
-        {/* Left Side: Local (Orange) */}
-        <div 
-          onClick={() => handleScoreTap(leftTeamKey)}
-          className="relative bg-orange-brand hover:bg-orange-brand/90 active:bg-orange-brand transition-all flex flex-col justify-between p-4 cursor-pointer border-r border-zinc-900"
-        >
-          {/* Top layout side info */}
-          <div className="flex items-center justify-between pointer-events-none">
-            <h2 className="text-lg font-black tracking-tight text-white uppercase">
-              {leftTeamName}
-            </h2>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/70">SETS:</span>
-              <span className="text-2xl font-black font-mono text-white">{leftSets}</span>
+      {isLandscape ? (
+        <div className="flex-grow grid grid-cols-2 relative">
+          {/* Left Side: Local (Orange) */}
+          <div 
+            onClick={() => handleScoreTap(leftTeamKey)}
+            className="relative bg-orange-brand hover:bg-orange-brand/90 active:bg-orange-brand transition-all flex flex-col justify-between p-4 cursor-pointer border-r border-zinc-900"
+          >
+            {/* Top layout side info */}
+            <div className="flex items-center justify-between pointer-events-none">
+              <h2 className="text-lg font-black tracking-tight text-white uppercase">
+                {leftTeamName}
+              </h2>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold text-white/70">SETS:</span>
+                <span className="text-2xl font-black font-mono text-white">{leftSets}</span>
+              </div>
+            </div>
+
+            {/* Giant Score */}
+            <div className="my-auto text-center flex flex-col justify-center items-center">
+              <span className="text-[7.5rem] xs:text-[9.5rem] sm:text-[11rem] md:text-[13rem] font-bold font-digital text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
+                {leftScore.toString().padStart(2, '0')}
+              </span>
+              
+              {/* Quick point adjustment buttons */}
+              <div className="flex items-center justify-center gap-6 mt-4 w-full max-w-[160px]" onClick={(e) => e.stopPropagation()}>
+                <button
+                  onClick={() => {
+                    playAudio('beep');
+                    subPoint(leftTeamKey);
+                  }}
+                  disabled={leftScore === 0}
+                  className="w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+                >
+                  -
+                </button>
+                <button
+                  onClick={() => handleScoreTap(leftTeamKey)}
+                  className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+                >
+                  +
+                </button>
+              </div>
+              <span className="text-[9px] uppercase font-bold text-white/70 mt-2 block pointer-events-none">
+                Toca la tarjeta para sumar
+              </span>
+            </div>
+
+            {/* Bottom Action bar */}
+            <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => handleTimeoutClick(leftTeamKey)}
+                disabled={leftTimeouts >= 2 || timeoutCountdown !== null}
+                className="px-3 py-2 bg-white/10 border border-white/20 disabled:opacity-30 font-bold text-[10px] text-white rounded-xl hover:bg-white/20 hover:border-white/40 transition-colors"
+              >
+                ⏱️ Tiempo Fuera ({leftTimeouts}/2)
+              </button>
+              <button
+                onClick={() => setServe(leftTeamKey)}
+                className={`px-3 py-2 border font-bold text-[10px] rounded-xl flex items-center gap-1.5 transition-colors ${
+                  servingTeam === leftTeamKey
+                    ? 'bg-white border-white text-orange-brand'
+                    : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
+                }`}
+              >
+                🏐 Saque {servingTeam === leftTeamKey && '✔'}
+              </button>
             </div>
           </div>
 
-          {/* Giant Score */}
-          <div className="my-auto text-center flex flex-col justify-center items-center">
-            <span className="text-[7.5rem] xs:text-[9.5rem] sm:text-[11rem] md:text-[13rem] font-bold font-digital text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
-              {leftScore.toString().padStart(2, '0')}
-            </span>
-            
-            {/* Quick point adjustment buttons */}
-            <div className="flex items-center justify-center gap-6 mt-4 w-full max-w-[160px]" onClick={(e) => e.stopPropagation()}>
+          {/* Right Side: Visitor (Purple) */}
+          <div 
+            onClick={() => handleScoreTap(rightTeamKey)}
+            className="relative bg-purple-brand hover:bg-purple-brand/90 active:bg-purple-brand transition-all flex flex-col justify-between p-4 cursor-pointer"
+          >
+            {/* Top layout side info */}
+            <div className="flex items-center justify-between pointer-events-none">
+              <h2 className="text-lg font-black tracking-tight text-white uppercase">
+                {rightTeamName}
+              </h2>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold text-white/70">SETS:</span>
+                <span className="text-2xl font-black font-mono text-white">{rightSets}</span>
+              </div>
+            </div>
+
+            {/* Giant Score */}
+            <div className="my-auto text-center flex flex-col justify-center items-center">
+              <span className="text-[7.5rem] xs:text-[9.5rem] sm:text-[11rem] md:text-[13rem] font-bold font-digital text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
+                {rightScore.toString().padStart(2, '0')}
+              </span>
+              
+              {/* Quick point adjustment buttons */}
+              <div className="flex items-center justify-center gap-6 mt-4 w-full max-w-[160px]" onClick={(e) => e.stopPropagation()}>
+                <button
+                  onClick={() => {
+                    playAudio('beep');
+                    subPoint(rightTeamKey);
+                  }}
+                  disabled={rightScore === 0}
+                  className="w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+                >
+                  -
+                </button>
+                <button
+                  onClick={() => handleScoreTap(rightTeamKey)}
+                  className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+                >
+                  +
+                </button>
+              </div>
+              <span className="text-[9px] uppercase font-bold text-white/70 mt-2 block pointer-events-none">
+                Toca la tarjeta para sumar
+              </span>
+            </div>
+
+            {/* Bottom Action bar */}
+            <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
               <button
-                onClick={() => {
-                  playAudio('beep');
-                  subPoint(leftTeamKey);
-                }}
-                disabled={leftScore === 0}
-                className="w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+                onClick={() => handleTimeoutClick(rightTeamKey)}
+                disabled={rightTimeouts >= 2 || timeoutCountdown !== null}
+                className="px-3 py-2 bg-white/10 border border-white/20 disabled:opacity-30 font-bold text-[10px] text-white rounded-xl hover:bg-white/20 hover:border-white/40 transition-colors"
               >
-                -
+                ⏱️ Tiempo Fuera ({rightTimeouts}/2)
               </button>
               <button
+                onClick={() => setServe(rightTeamKey)}
+                className={`px-3 py-2 border font-bold text-[10px] rounded-xl flex items-center gap-1.5 transition-colors ${
+                  servingTeam === rightTeamKey
+                    ? 'bg-white border-white text-purple-brand'
+                    : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
+                }`}
+              >
+                🏐 Saque {servingTeam === rightTeamKey && '✔'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* PORTRAIT LAYOUT: compact side-by-side cards */
+        <div className="flex flex-col flex-grow p-3 gap-3 relative z-0 justify-center">
+          <div className="grid grid-cols-2 gap-3 w-full items-stretch">
+            {/* LEFT CARD (ORANGE) */}
+            <div className="flex flex-col items-center justify-between rounded-2xl bg-orange-brand hover:bg-orange-brand/95 transition-all p-3 pb-4 relative overflow-hidden border border-orange-500/30">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-orange-brand" />
+              <div className="flex items-center justify-between w-full mb-2 px-1">
+                <span className="text-[10px] text-white/80 font-mono font-bold">SETS: {leftSets}</span>
+                {servingTeam === leftTeamKey && (
+                  <span className="flex items-center justify-center w-4 h-4 bg-white text-orange-brand rounded-full text-[9px] font-black animate-bounce shadow">🏐</span>
+                )}
+              </div>
+              <h2 className="text-sm font-black text-white uppercase truncate max-w-[90%] mb-2.5">{leftTeamName}</h2>
+              <div
                 onClick={() => handleScoreTap(leftTeamKey)}
-                className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+                className="w-full h-44 xs:h-52 flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
               >
-                +
-              </button>
+                <span className="font-digital text-[6.5rem] xs:text-[8rem] font-bold text-white select-none leading-none tracking-tighter digital-glow-white">
+                  {leftScore.toString().padStart(2, '0')}
+                </span>
+              </div>
+              <div className="flex flex-col items-center w-full gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-center gap-4 w-full">
+                  <button
+                    onClick={() => {
+                      playAudio('beep');
+                      subPoint(leftTeamKey);
+                    }}
+                    disabled={leftScore === 0}
+                    className="w-11 h-11 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={() => handleScoreTap(leftTeamKey)}
+                    className="w-11 h-11 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="flex justify-between w-full gap-1 mt-1.5">
+                  <button
+                    onClick={() => handleTimeoutClick(leftTeamKey)}
+                    disabled={leftTimeouts >= 2 || timeoutCountdown !== null}
+                    className="flex-1 py-1.5 bg-white/10 border border-white/20 text-[10px] font-bold text-white rounded-lg hover:bg-white/20 disabled:opacity-30"
+                  >
+                    ⏱️ Tiempo ({leftTimeouts}/2)
+                  </button>
+                  <button
+                    onClick={() => setServe(leftTeamKey)}
+                    className={`flex-1 py-1.5 border text-[10px] font-bold rounded-lg ${
+                      servingTeam === leftTeamKey
+                        ? 'bg-white border-white text-orange-brand'
+                        : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
+                    }`}
+                  >
+                    🏐 Saque
+                  </button>
+                </div>
+              </div>
             </div>
-            <span className="text-[9px] uppercase font-bold text-white/70 mt-2 block pointer-events-none">
-              Toca la tarjeta para sumar
-            </span>
-          </div>
 
-          {/* Bottom Action bar */}
-          <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => handleTimeoutClick(leftTeamKey)}
-              disabled={leftTimeouts >= 2 || timeoutCountdown !== null}
-              className="px-3 py-2 bg-white/10 border border-white/20 disabled:opacity-30 font-bold text-[10px] text-white rounded-xl hover:bg-white/20 hover:border-white/40 transition-colors"
-            >
-              ⏱️ Tiempo Fuera ({leftTimeouts}/2)
-            </button>
-            <button
-              onClick={() => setServe(leftTeamKey)}
-              className={`px-3 py-2 border font-bold text-[10px] rounded-xl flex items-center gap-1.5 transition-colors ${
-                servingTeam === leftTeamKey
-                  ? 'bg-white border-white text-orange-brand'
-                  : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
-              }`}
-            >
-              🏐 Saque {servingTeam === leftTeamKey && '✔'}
-            </button>
-          </div>
-        </div>
-
-        {/* Right Side: Visitor (Purple) */}
-        <div 
-          onClick={() => handleScoreTap(rightTeamKey)}
-          className="relative bg-purple-brand hover:bg-purple-brand/90 active:bg-purple-brand transition-all flex flex-col justify-between p-4 cursor-pointer"
-        >
-          {/* Top layout side info */}
-          <div className="flex items-center justify-between pointer-events-none">
-            <h2 className="text-lg font-black tracking-tight text-white uppercase">
-              {rightTeamName}
-            </h2>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/70">SETS:</span>
-              <span className="text-2xl font-black font-mono text-white">{rightSets}</span>
-            </div>
-          </div>
-
-          {/* Giant Score */}
-          <div className="my-auto text-center flex flex-col justify-center items-center">
-            <span className="text-[7.5rem] xs:text-[9.5rem] sm:text-[11rem] md:text-[13rem] font-bold font-digital text-white tracking-tighter block leading-none digital-glow-white pointer-events-none">
-              {rightScore.toString().padStart(2, '0')}
-            </span>
-            
-            {/* Quick point adjustment buttons */}
-            <div className="flex items-center justify-center gap-6 mt-4 w-full max-w-[160px]" onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={() => {
-                  playAudio('beep');
-                  subPoint(rightTeamKey);
-                }}
-                disabled={rightScore === 0}
-                className="w-12 h-12 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
-              >
-                -
-              </button>
-              <button
+            {/* RIGHT CARD (PURPLE) */}
+            <div className="flex flex-col items-center justify-between rounded-2xl bg-purple-brand hover:bg-purple-brand/95 transition-all p-3 pb-4 relative overflow-hidden border border-purple-500/30">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-purple-brand" />
+              <div className="flex items-center justify-between w-full mb-2 px-1">
+                <span className="text-[10px] text-white/80 font-mono font-bold">SETS: {rightSets}</span>
+                {servingTeam === rightTeamKey && (
+                  <span className="flex items-center justify-center w-4 h-4 bg-white text-purple-brand rounded-full text-[9px] font-black animate-bounce shadow">🏐</span>
+                )}
+              </div>
+              <h2 className="text-sm font-black text-white uppercase truncate max-w-[90%] mb-2.5">{rightTeamName}</h2>
+              <div
                 onClick={() => handleScoreTap(rightTeamKey)}
-                className="w-12 h-12 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+                className="w-full h-44 xs:h-52 flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
               >
-                +
-              </button>
+                <span className="font-digital text-[6.5rem] xs:text-[8rem] font-bold text-white select-none leading-none tracking-tighter digital-glow-white">
+                  {rightScore.toString().padStart(2, '0')}
+                </span>
+              </div>
+              <div className="flex flex-col items-center w-full gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-center gap-4 w-full">
+                  <button
+                    onClick={() => {
+                      playAudio('beep');
+                      subPoint(rightTeamKey);
+                    }}
+                    disabled={rightScore === 0}
+                    className="w-11 h-11 flex items-center justify-center bg-black/40 hover:bg-black/60 border border-white/20 rounded-full font-black text-2xl text-white active:scale-95 transition-all disabled:opacity-30"
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={() => handleScoreTap(rightTeamKey)}
+                    className="w-11 h-11 flex items-center justify-center bg-white/20 hover:bg-white/30 border border-white/30 rounded-full font-black text-2xl text-white active:scale-95 transition-all"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="flex justify-between w-full gap-1 mt-1.5">
+                  <button
+                    onClick={() => handleTimeoutClick(rightTeamKey)}
+                    disabled={rightTimeouts >= 2 || timeoutCountdown !== null}
+                    className="flex-1 py-1.5 bg-white/10 border border-white/20 text-[10px] font-bold text-white rounded-lg hover:bg-white/20 disabled:opacity-30"
+                  >
+                    ⏱️ Tiempo ({rightTimeouts}/2)
+                  </button>
+                  <button
+                    onClick={() => setServe(rightTeamKey)}
+                    className={`flex-1 py-1.5 border text-[10px] font-bold rounded-lg ${
+                      servingTeam === rightTeamKey
+                        ? 'bg-white border-white text-purple-brand'
+                        : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
+                    }`}
+                  >
+                    🏐 Saque
+                  </button>
+                </div>
+              </div>
             </div>
-            <span className="text-[9px] uppercase font-bold text-white/70 mt-2 block pointer-events-none">
-              Toca la tarjeta para sumar
-            </span>
-          </div>
-
-          {/* Bottom Action bar */}
-          <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => handleTimeoutClick(rightTeamKey)}
-              disabled={rightTimeouts >= 2 || timeoutCountdown !== null}
-              className="px-3 py-2 bg-white/10 border border-white/20 disabled:opacity-30 font-bold text-[10px] text-white rounded-xl hover:bg-white/20 hover:border-white/40 transition-colors"
-            >
-              ⏱️ Tiempo Fuera ({rightTimeouts}/2)
-            </button>
-            <button
-              onClick={() => setServe(rightTeamKey)}
-              className={`px-3 py-2 border font-bold text-[10px] rounded-xl flex items-center gap-1.5 transition-colors ${
-                servingTeam === rightTeamKey
-                  ? 'bg-white border-white text-purple-brand'
-                  : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
-              }`}
-            >
-              🏐 Saque {servingTeam === rightTeamKey && '✔'}
-            </button>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 4. CANCHA rotation layout */}
       {showRotations && renderCourtGrid()}

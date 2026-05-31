@@ -433,7 +433,7 @@ export default function MatchScoreboard() {
         </div>
       ) : (
         /* PORTRAIT LAYOUT: SCORECARDS SIDE-BY-SIDE AT SAME HEIGHT FOR MOBILE EASY USE */
-        <div className="flex flex-col flex-grow p-3 gap-3 relative z-0 justify-start">
+        <div className="flex flex-col flex-grow p-3 gap-3 relative z-0 justify-center">
           {/* Side-by-side Scoreboards */}
           <div className="grid grid-cols-2 gap-3 w-full items-stretch">
             {/* LEFT SCOREBOARD CARD (ORANGE) */}
