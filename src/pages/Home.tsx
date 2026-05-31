@@ -8,7 +8,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-between min-h-[85vh] p-4 text-white select-none">
       {/* Header / Brand */}
       <div className="flex flex-col items-center mt-6 text-center">
-        <h1 className="text-[22px] font-extrabold tracking-tight bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
+        <h1 className="text-[32px] xs:text-[36px] font-black tracking-tight leading-none bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
           PuntosVolley
         </h1>
         <p className="text-sm font-semibold tracking-wider text-gray-450 uppercase mt-1 mb-4 flex items-center gap-1 justify-center">
