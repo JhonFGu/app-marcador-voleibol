@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/app-marcador-voleibol/',
   plugins: [
     react(), 
     tailwindcss(),
@@ -19,8 +20,8 @@ export default defineConfig({
         background_color: '#000000',
         display: 'standalone',
         orientation: 'any',
-        start_url: '/',
-        id: '/',
+        start_url: '/app-marcador-voleibol/',
+        id: '/app-marcador-voleibol/',
         icons: [
           {
             src: '/pwa-192x192.png',
