@@ -18,7 +18,8 @@ export function generateRoundRobin(
   tournamentId: string,
   courtCount: number,
   matchType: 'league' | 'group' = 'league',
-  groupName?: string
+  groupName?: string,
+  assignedCourt?: number
 ): GeneratedMatch[] {
   const teams = [...teamIds];
   
@@ -55,7 +56,7 @@ export function generateRoundRobin(
           tournament_id: tournamentId,
           team1_id: isHome ? home : away,
           team2_id: isHome ? away : home,
-          court: courtIndex,
+          court: assignedCourt !== undefined ? assignedCourt : courtIndex,
           status: 'pending',
           score_json: { sets: [], winner_id: null },
           match_type: matchType,
@@ -99,13 +100,16 @@ export function generateGroupFixtures(
   // Generate round-robin matches for each group
   let allMatches: GeneratedMatch[] = [];
   
-  Object.entries(groups).forEach(([groupName, groupTeamIds]) => {
+  Object.entries(groups).forEach(([groupName, groupTeamIds], groupIndex) => {
+    const assignedCourt = groupCount === courtCount ? (groupIndex % courtCount) + 1 : undefined;
+
     const groupMatches = generateRoundRobin(
       groupTeamIds,
       tournamentId,
       courtCount,
       'group',
-      `Grupo ${groupName}`
+      `Grupo ${groupName}`,
+      assignedCourt
     );
     allMatches = [...allMatches, ...groupMatches];
   });
