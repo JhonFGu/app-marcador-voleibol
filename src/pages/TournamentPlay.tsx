@@ -503,20 +503,20 @@ export default function TournamentPlay() {
                   >
                     {/* Header line info */}
                     <div className="flex items-center justify-between border-b border-zinc-900/60 pb-2">
-                      <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wide">
+                      <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">
                         Ronda {m.round} {m.group_name ? `• ${m.group_name}` : ''} • Cancha {m.court}
                       </span>
                       {m.status === 'in_progress' ? (
-                        <span className="px-2 py-0.5 rounded bg-red-500/10 text-red-500 text-[8px] font-black border border-red-500/20 uppercase tracking-wider animate-pulse flex items-center gap-1">
+                        <span className="px-2.5 py-1 rounded bg-red-500/10 text-red-500 text-xs font-black border border-red-500/20 uppercase tracking-wider animate-pulse flex items-center gap-1">
                           En Arbitraje 🔴
                         </span>
                       ) : m.status === 'finished' ? (
-                        <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 text-[8px] font-bold border border-zinc-800 uppercase tracking-wide">
+                        <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 text-xs font-bold border border-zinc-800 uppercase tracking-wide">
                           Finalizado
                         </span>
                       ) : (
                         m.scheduled_time && (
-                          <span className="text-[9px] font-bold text-orange-brand font-mono">
+                          <span className="text-sm font-bold text-orange-brand font-mono">
                             🕒 {new Date(m.scheduled_time).toLocaleDateString('es-ES', {
                               day: 'numeric',
                               month: 'short',
@@ -534,7 +534,7 @@ export default function TournamentPlay() {
                       <div className="flex flex-col gap-2.5 text-left flex-grow">
                         {/* Team 1 */}
                         <div className="flex items-center justify-between">
-                          <span className={`text-xs font-extrabold ${
+                          <span className={`text-base font-extrabold ${
                             m.status === 'finished' && liveScore.winner_id === m.team1_id
                               ? 'text-orange-brand'
                               : 'text-zinc-200'
@@ -544,16 +544,16 @@ export default function TournamentPlay() {
                           {m.status !== 'pending' && (
                             <div className="flex items-center gap-2">
                               {prevSets.map((set: any, idx: number) => (
-                                <span key={idx} className="text-[10px] font-semibold text-zinc-500 font-mono w-5 text-center">
+                                <span key={idx} className="text-sm font-semibold text-zinc-500 font-mono w-5 text-center">
                                   {set.team1}
                                 </span>
                               ))}
                               {m.status === 'in_progress' && (
-                                <span className="text-xs font-black text-orange-brand font-mono w-5 text-center bg-orange-brand/10 rounded px-0.5">
+                                <span className="text-base font-black text-orange-brand font-mono w-5 text-center bg-orange-brand/10 rounded px-0.5">
                                   {currentSet.team1}
                                 </span>
                               )}
-                              <span className="text-xs font-black text-zinc-100 font-mono pl-3 w-5 text-right">
+                              <span className="text-base font-black text-zinc-100 font-mono pl-3 w-5 text-right">
                                 {setsWon.team1}
                               </span>
                             </div>
@@ -562,7 +562,7 @@ export default function TournamentPlay() {
 
                         {/* Team 2 */}
                         <div className="flex items-center justify-between">
-                          <span className={`text-xs font-extrabold ${
+                          <span className={`text-base font-extrabold ${
                             m.status === 'finished' && liveScore.winner_id === m.team2_id
                               ? 'text-purple-brand'
                               : 'text-zinc-200'
@@ -572,16 +572,16 @@ export default function TournamentPlay() {
                           {m.status !== 'pending' && (
                             <div className="flex items-center gap-2">
                               {prevSets.map((set: any, idx: number) => (
-                                <span key={idx} className="text-[10px] font-semibold text-zinc-500 font-mono w-5 text-center">
+                                <span key={idx} className="text-sm font-semibold text-zinc-500 font-mono w-5 text-center">
                                   {set.team2}
                                 </span>
                               ))}
                               {m.status === 'in_progress' && (
-                                <span className="text-xs font-black text-purple-brand font-mono w-5 text-center bg-purple-brand/10 rounded px-0.5">
+                                <span className="text-base font-black text-purple-brand font-mono w-5 text-center bg-purple-brand/10 rounded px-0.5">
                                   {currentSet.team2}
                                 </span>
                               )}
-                              <span className="text-xs font-black text-zinc-100 font-mono pl-3 w-5 text-right">
+                              <span className="text-base font-black text-zinc-100 font-mono pl-3 w-5 text-right">
                                 {setsWon.team2}
                               </span>
                             </div>
@@ -594,7 +594,7 @@ export default function TournamentPlay() {
                     {status === 'active' && m.status !== 'finished' && (
                       <button
                         onClick={() => navigate(`/admin/match/referee/${m.id}`)}
-                        className="mt-1 flex items-center justify-center gap-1.5 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-orange-brand/50 text-white font-extrabold rounded-xl text-[10px] uppercase tracking-wider transition-all"
+                        className="mt-1 flex items-center justify-center gap-1.5 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-orange-brand/50 text-white font-extrabold rounded-xl text-base uppercase tracking-wider transition-all"
                       >
                         <Play className="w-3 h-3 fill-current text-orange-brand" />
                         {m.status === 'in_progress' ? 'Continuar Arbitraje' : 'Iniciar Arbitraje'}
