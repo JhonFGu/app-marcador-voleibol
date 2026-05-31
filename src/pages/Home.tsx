@@ -8,10 +8,10 @@ export default function Home() {
     <div className="flex flex-col items-center justify-between min-h-[85vh] p-4 text-white select-none">
       {/* Header / Brand */}
       <div className="flex flex-col items-center mt-6 text-center">
-        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
+        <h1 className="text-[22px] font-extrabold tracking-tight bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
           PuntosVolley
         </h1>
-        <p className="text-xs font-semibold tracking-wider text-gray-450 uppercase mt-1 mb-4 flex items-center gap-1 justify-center">
+        <p className="text-sm font-semibold tracking-wider text-gray-450 uppercase mt-1 mb-4 flex items-center gap-1 justify-center">
           Creado con <span className="text-red-500 animate-pulse">❤️</span> por Cuervos Volley Club
         </p>
         <div className="relative flex items-center justify-center w-36 h-36 bg-zinc-900/50 border border-zinc-800/80 rounded-3xl shadow-xl overflow-hidden p-1 bg-gradient-to-tr from-orange-brand/5 to-purple-brand/5">
@@ -35,8 +35,8 @@ export default function Home() {
               <Play className="w-6 h-6 fill-current" />
             </div>
             <div>
-              <h3 className="font-bold text-lg text-white">Partido Simple</h3>
-              <p className="text-xs text-gray-400">Marcador rápido local sin cuenta</p>
+              <h3 className="font-bold text-base text-white">Partido Simple</h3>
+              <p className="text-sm text-gray-400">Marcador rápido local sin cuenta</p>
             </div>
           </div>
           <span className="text-orange-brand font-bold text-xl mr-2">→</span>
@@ -52,8 +52,8 @@ export default function Home() {
               <Trophy className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-bold text-lg text-white">Torneo / Club</h3>
-              <p className="text-xs text-gray-400">Partidos, tablas e historial en la nube</p>
+              <h3 className="font-bold text-base text-white">Torneo / Club</h3>
+              <p className="text-sm text-gray-400">Partidos, tablas e historial en la nube</p>
             </div>
           </div>
           <span className="text-purple-brand font-bold text-xl mr-2">→</span>
@@ -64,12 +64,12 @@ export default function Home() {
       <div className="w-full max-w-sm">
         <button
           onClick={() => navigate('/admin/login')}
-          className="flex items-center justify-center gap-2 w-full py-3 bg-zinc-950 border border-zinc-900 rounded-xl text-xs font-semibold text-gray-400 hover:text-white hover:border-zinc-800 transition-all"
+          className="flex items-center justify-center gap-2 w-full py-3 bg-zinc-950 border border-zinc-900 rounded-xl text-base font-semibold text-gray-400 hover:text-white hover:border-zinc-800 transition-all"
         >
           <ShieldAlert className="w-4 h-4" />
           Acceso Administrador / Árbitro
         </button>
-        <p className="text-[10px] text-center text-zinc-600 mt-4">
+        <p className="text-xs text-center text-zinc-600 mt-4">
           v1.0.0 • © 2026 Cuervos Volley Club. Todos los derechos reservados.
         </p>
       </div>
