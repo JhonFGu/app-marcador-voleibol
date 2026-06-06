@@ -52,7 +52,7 @@ export default function Home() {
               <Trophy className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-bold text-base text-white">Torneo / Club</h3>
+              <h3 className="font-bold text-base text-white">Torneos / Fogueos</h3>
               <p className="text-sm text-gray-400">Partidos, tablas e historial en la nube</p>
             </div>
           </div>
