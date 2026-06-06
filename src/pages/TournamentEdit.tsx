@@ -52,6 +52,9 @@ export default function TournamentEdit() {
   const [overtimeMode, setOvertimeMode] = useState<'con_alargue' | 'a_muerte'>('con_alargue');
   const [format, setFormat] = useState<'league' | 'groups'>('league');
   const [groupCount, setGroupCount] = useState<number>(2);
+  const [groupAssignmentMode, setGroupAssignmentMode] = useState<'automatic' | 'manual'>('automatic');
+  const [manualTeamsGroups, setManualTeamsGroups] = useState<{ [teamId: string]: string }>({});
+  const [manualGroupsCourts, setManualGroupsCourts] = useState<{ [groupLetter: string]: number }>({});
   const [isSavingRules, setIsSavingRules] = useState(false);
 
   // Teams State
@@ -133,6 +136,9 @@ export default function TournamentEdit() {
       setOvertimeMode(config.overtimeMode || 'con_alargue');
       setFormat(config.format || 'league');
       setGroupCount(config.groupCount || 2);
+      setGroupAssignmentMode(config.groupAssignmentMode || 'automatic');
+      setManualTeamsGroups(config.manualTeamsGroups || {});
+      setManualGroupsCourts(config.manualGroupsCourts || {});
 
       // 2. Get Teams
       await fetchTeams();
@@ -192,6 +198,9 @@ export default function TournamentEdit() {
         courts,
         format,
         groupCount,
+        groupAssignmentMode,
+        manualTeamsGroups,
+        manualGroupsCourts,
         scoring: { win_2_0: 3, win_2_1: 2, loss_2_1: 1, loss_2_0: 0 },
         tiebreak_criteria: ['point_diff', 'set_ratio', 'point_ratio', 'head_to_head']
       };
@@ -406,7 +415,51 @@ export default function TournamentEdit() {
       if (format === 'league') {
         newMatches = generateRoundRobin(teamIds, id!, courts);
       } else {
-        newMatches = generateGroupFixtures(teamIds, id!, courts, groupCount);
+        if (groupAssignmentMode === 'manual') {
+          // Construct manualGroups mapping
+          const manualGroups: { [groupLetter: string]: string[] } = {};
+          for (let i = 0; i < groupCount; i++) {
+            const letter = String.fromCharCode(65 + i);
+            manualGroups[letter] = [];
+          }
+          teams.forEach((team) => {
+            const letter = manualTeamsGroups[team.id] || 'A';
+            if (manualGroups[letter]) {
+              manualGroups[letter].push(team.id);
+            } else {
+              manualGroups['A'].push(team.id);
+            }
+          });
+
+          // Validate that all groups have at least 2 teams
+          const underLimitGroups = Object.entries(manualGroups).filter(([_, ids]) => ids.length < 2);
+          if (underLimitGroups.length > 0 && teams.length >= groupCount * 2) {
+            const underGroupsNames = underLimitGroups.map(([letter]) => `Grupo ${letter}`).join(', ');
+            alert(`Para generar los partidos, cada grupo debe tener al menos 2 equipos. Revisa: ${underGroupsNames}`);
+            setIsGeneratingFixture(false);
+            return;
+          }
+
+          // Construct finalGroupsCourts mapping
+          const finalGroupsCourts: { [groupLetter: string]: number } = {};
+          for (let i = 0; i < groupCount; i++) {
+            const letter = String.fromCharCode(65 + i);
+            finalGroupsCourts[letter] = manualGroupsCourts[letter] !== undefined 
+              ? manualGroupsCourts[letter] 
+              : (i % courts) + 1;
+          }
+
+          newMatches = generateGroupFixtures(
+            teamIds,
+            id!,
+            courts,
+            groupCount,
+            manualGroups,
+            finalGroupsCourts
+          );
+        } else {
+          newMatches = generateGroupFixtures(teamIds, id!, courts, groupCount);
+        }
       }
 
       // 2.5 Assign scheduled times consecutively per court
@@ -443,6 +496,9 @@ export default function TournamentEdit() {
           courts,
           format,
           groupCount,
+          groupAssignmentMode,
+          manualTeamsGroups,
+          manualGroupsCourts,
           scoring: { win_2_0: 3, win_2_1: 2, loss_2_1: 1, loss_2_0: 0 },
           tiebreak_criteria: ['point_diff', 'set_ratio', 'point_ratio', 'head_to_head']
         };
@@ -497,6 +553,9 @@ export default function TournamentEdit() {
         courts,
         format,
         groupCount,
+        groupAssignmentMode,
+        manualTeamsGroups,
+        manualGroupsCourts,
         scoring: { win_2_0: 3, win_2_1: 2, loss_2_1: 1, loss_2_0: 0 },
         tiebreak_criteria: ['point_diff', 'set_ratio', 'point_ratio', 'head_to_head']
       };
@@ -650,6 +709,7 @@ export default function TournamentEdit() {
                   >
                     <option value={25}>25 puntos</option>
                     <option value={21}>21 puntos</option>
+                    <option value={18}>18 puntos</option>
                     <option value={15}>15 puntos</option>
                     <option value={11}>11 puntos</option>
                     <option value={9}>9 puntos</option>
@@ -938,8 +998,39 @@ export default function TournamentEdit() {
 
             </div>
 
-            {/* Groups layout visualizer */}
+            {/* Group Assignment Mode Selector */}
             {format === 'groups' && teams.length >= 2 && (
+              <div className="flex flex-col gap-1.5 p-4 bg-zinc-950 border border-zinc-900 rounded-2xl">
+                <label className="text-xs text-gray-400">Distribución de Grupos</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setGroupAssignmentMode('automatic')}
+                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      groupAssignmentMode === 'automatic'
+                        ? 'bg-zinc-900 border-zinc-300 text-zinc-200'
+                        : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
+                    }`}
+                  >
+                    Sorteo Automático 🎲
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGroupAssignmentMode('manual')}
+                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      groupAssignmentMode === 'manual'
+                        ? 'bg-zinc-900 border-zinc-300 text-zinc-200'
+                        : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
+                    }`}
+                  >
+                    Asignación Manual 📝
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Groups layout visualizer (Automatic Mode) */}
+            {format === 'groups' && teams.length >= 2 && groupAssignmentMode === 'automatic' && (
               <div className="flex flex-col gap-3 p-4 bg-zinc-950 border border-zinc-900 rounded-2xl relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <h4 className="text-[10px] font-bold uppercase tracking-wider text-purple-brand">
@@ -995,6 +1086,99 @@ export default function TournamentEdit() {
                       </div>
                     ));
                   })()}
+                </div>
+              </div>
+            )}
+
+            {/* Manual Assignment Panel */}
+            {format === 'groups' && teams.length >= 2 && groupAssignmentMode === 'manual' && (
+              <div className="flex flex-col gap-4 p-4 bg-zinc-950 border border-zinc-900 rounded-2xl">
+                <div>
+                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-purple-brand">
+                    Asignación de Equipos a Grupos
+                  </h4>
+                  <p className="text-[10px] text-zinc-500 mt-1">
+                    Selecciona a qué grupo pertenece cada equipo registrado.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto pr-1">
+                  {teams.map((team) => {
+                    const currentGroup = manualTeamsGroups[team.id] || 'A';
+                    return (
+                      <div key={team.id} className="flex items-center justify-between p-2.5 bg-zinc-900/60 border border-zinc-850 rounded-xl">
+                        <span className="text-xs font-semibold text-zinc-300 truncate max-w-[180px]">
+                          {team.name}
+                        </span>
+                        <select
+                          value={currentGroup}
+                          onChange={(e) => {
+                            const newGroup = e.target.value;
+                            setManualTeamsGroups(prev => ({
+                              ...prev,
+                              [team.id]: newGroup
+                            }));
+                          }}
+                          className="px-2 py-1.5 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-350 focus:outline-none focus:border-purple-brand"
+                        >
+                          {Array.from({ length: groupCount }).map((_, idx) => {
+                            const letter = String.fromCharCode(65 + idx);
+                            return (
+                              <option key={letter} value={letter}>
+                                Grupo {letter}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Courts Assignment for Groups */}
+                <div className="border-t border-zinc-900 pt-3 flex flex-col gap-3">
+                  <div>
+                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-orange-brand">
+                      Asignación de Grupos a Canchas
+                    </h4>
+                    <p className="text-[10px] text-zinc-500 mt-1">
+                      Define la cancha fija para cada grupo.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {Array.from({ length: groupCount }).map((_, idx) => {
+                      const letter = String.fromCharCode(65 + idx);
+                      const currentCourt = manualGroupsCourts[letter] !== undefined 
+                        ? manualGroupsCourts[letter] 
+                        : (idx % courts) + 1;
+                      return (
+                        <div key={letter} className="flex flex-col gap-1.5 p-2.5 bg-zinc-900/60 border border-zinc-850 rounded-xl">
+                          <span className="text-[11px] font-black text-zinc-350 uppercase">Grupo {letter}</span>
+                          <select
+                            value={currentCourt}
+                            onChange={(e) => {
+                              const newCourt = Number(e.target.value);
+                              setManualGroupsCourts(prev => ({
+                                ...prev,
+                                [letter]: newCourt
+                              }));
+                            }}
+                            className="px-2 py-1.5 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-350 focus:outline-none focus:border-orange-brand"
+                          >
+                            {Array.from({ length: courts }).map((_, cIdx) => {
+                              const courtNum = cIdx + 1;
+                              return (
+                                <option key={courtNum} value={courtNum}>
+                                  Cancha {courtNum}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
