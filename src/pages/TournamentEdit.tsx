@@ -967,6 +967,8 @@ export default function TournamentEdit() {
                     <option value={2}>2 Grupos</option>
                     <option value={3}>3 Grupos</option>
                     <option value={4}>4 Grupos</option>
+                    <option value={5}>5 Grupos</option>
+                    <option value={6}>6 Grupos</option>
                   </select>
                 </div>
               )}
