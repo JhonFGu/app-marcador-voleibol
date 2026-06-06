@@ -80,28 +80,41 @@ export function generateGroupFixtures(
   teamIds: string[],
   tournamentId: string,
   courtCount: number,
-  groupCount: number
+  groupCount: number,
+  manualGroups?: { [groupLetter: string]: string[] },
+  manualGroupsCourts?: { [groupLetter: string]: number }
 ): GeneratedMatch[] {
-  if (teamIds.length < groupCount * 2) return [];
+  if (teamIds.length < groupCount * 2 && !manualGroups) return [];
 
   // Distribute teams to groups
   const groups: { [key: string]: string[] } = {};
   const alph = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-  for (let i = 0; i < groupCount; i++) {
-    groups[alph[i]] = [];
-  }
+  if (manualGroups) {
+    Object.entries(manualGroups).forEach(([letter, ids]) => {
+      groups[letter] = ids;
+    });
+  } else {
+    for (let i = 0; i < groupCount; i++) {
+      groups[alph[i]] = [];
+    }
 
-  teamIds.forEach((teamId, index) => {
-    const groupLetter = alph[index % groupCount];
-    groups[groupLetter].push(teamId);
-  });
+    teamIds.forEach((teamId, index) => {
+      const groupLetter = alph[index % groupCount];
+      groups[groupLetter].push(teamId);
+    });
+  }
 
   // Generate round-robin matches for each group
   let allMatches: GeneratedMatch[] = [];
   
   Object.entries(groups).forEach(([groupName, groupTeamIds], groupIndex) => {
-    const assignedCourt = groupCount === courtCount ? (groupIndex % courtCount) + 1 : undefined;
+    let assignedCourt: number | undefined = undefined;
+    if (manualGroupsCourts && manualGroupsCourts[groupName] !== undefined) {
+      assignedCourt = manualGroupsCourts[groupName];
+    } else if (groupCount === courtCount) {
+      assignedCourt = (groupIndex % courtCount) + 1;
+    }
 
     const groupMatches = generateRoundRobin(
       groupTeamIds,

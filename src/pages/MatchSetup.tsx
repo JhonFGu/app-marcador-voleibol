@@ -144,6 +144,7 @@ export default function MatchSetup() {
                 <option value={9}>9 puntos</option>
                 <option value={11}>11 puntos</option>
                 <option value={15}>15 puntos</option>
+                <option value={18}>18 puntos</option>
                 <option value={21}>21 puntos</option>
                 <option value={25}>25 puntos</option>
               </select>
