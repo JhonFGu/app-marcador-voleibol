@@ -55,6 +55,8 @@ export default function TournamentPlay() {
   const [status, setStatus] = useState<'draft' | 'active' | 'finished'>('active');
   const [format, setFormat] = useState<'league' | 'groups'>('league');
   const [groupCount, setGroupCount] = useState<number>(2);
+  const [courts, setCourts] = useState<number>(1);
+  const [selectedCourtFilter, setSelectedCourtFilter] = useState<number | 'all'>('all');
   const [teams, setTeams] = useState<Team[]>([]);
   const [teamRosters, setTeamRosters] = useState<{ [teamId: string]: Player[] }>({});
   const [matches, setMatches] = useState<Match[]>([]);
@@ -96,6 +98,7 @@ export default function TournamentPlay() {
       const config = tData.config_json || {};
       setFormat(config.format || 'league');
       setGroupCount(config.groupCount || 2);
+      setCourts(config.courts || 1);
 
       // 2. Get Teams
       const { data: teamsData, error: teamsErr } = await supabase
@@ -486,123 +489,160 @@ export default function TournamentPlay() {
                 Aún no hay partidos generados.
               </div>
             ) : (
-              matches.map((m) => {
-                const liveScore = m.score_json || {};
-                const currentSet = liveScore.current_set || { team1: 0, team2: 0 };
-                const setsWon = liveScore.sets_won || { team1: 0, team2: 0 };
-                const prevSets = liveScore.sets || [];
-
-                return (
-                  <div
-                    key={m.id}
-                    className={`p-4 border rounded-2xl flex flex-col gap-3 ${
-                      m.status === 'in_progress' 
-                        ? 'bg-zinc-950 border-orange-brand/50 shadow-md shadow-orange-brand/5'
-                        : 'bg-zinc-950/40 border-zinc-900'
-                    }`}
-                  >
-                    {/* Header line info */}
-                    <div className="flex items-center justify-between border-b border-zinc-900/60 pb-2">
-                      <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">
-                        Ronda {m.round} {m.group_name ? `• ${m.group_name}` : ''} • Cancha {m.court}
-                      </span>
-                      {m.status === 'in_progress' ? (
-                        <span className="px-2.5 py-1 rounded bg-red-500/10 text-red-500 text-xs font-black border border-red-500/20 uppercase tracking-wider animate-pulse flex items-center gap-1">
-                          En Arbitraje 🔴
-                        </span>
-                      ) : m.status === 'finished' ? (
-                        <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 text-xs font-bold border border-zinc-800 uppercase tracking-wide">
-                          Finalizado
-                        </span>
-                      ) : (
-                        m.scheduled_time && (
-                          <span className="text-sm font-bold text-orange-brand font-mono">
-                            🕒 {new Date(m.scheduled_time).toLocaleDateString('es-ES', {
-                              day: 'numeric',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true
-                            })}
-                          </span>
-                        )
-                      )}
-                    </div>
-
-                    {/* Team display and score */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col gap-2.5 text-left flex-grow">
-                        {/* Team 1 */}
-                        <div className="flex items-center justify-between">
-                          <span className={`text-base font-extrabold ${
-                            m.status === 'finished' && liveScore.winner_id === m.team1_id
-                              ? 'text-orange-brand'
-                              : 'text-zinc-200'
-                          }`}>
-                            {m.team1?.name || 'Local'}
-                          </span>
-                          {m.status !== 'pending' && (
-                            <div className="flex items-center gap-2">
-                              {prevSets.map((set: any, idx: number) => (
-                                <span key={idx} className="text-sm font-semibold text-zinc-500 font-mono w-5 text-center">
-                                  {set.team1}
-                                </span>
-                              ))}
-                              {m.status === 'in_progress' && (
-                                <span className="text-base font-black text-orange-brand font-mono w-5 text-center bg-orange-brand/10 rounded px-0.5">
-                                  {currentSet.team1}
-                                </span>
-                              )}
-                              <span className="text-base font-black text-zinc-100 font-mono pl-3 w-5 text-right">
-                                {setsWon.team1}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Team 2 */}
-                        <div className="flex items-center justify-between">
-                          <span className={`text-base font-extrabold ${
-                            m.status === 'finished' && liveScore.winner_id === m.team2_id
-                              ? 'text-purple-brand'
-                              : 'text-zinc-200'
-                          }`}>
-                            {m.team2?.name || 'Visitante'}
-                          </span>
-                          {m.status !== 'pending' && (
-                            <div className="flex items-center gap-2">
-                              {prevSets.map((set: any, idx: number) => (
-                                <span key={idx} className="text-sm font-semibold text-zinc-500 font-mono w-5 text-center">
-                                  {set.team2}
-                                </span>
-                              ))}
-                              {m.status === 'in_progress' && (
-                                <span className="text-base font-black text-purple-brand font-mono w-5 text-center bg-purple-brand/10 rounded px-0.5">
-                                  {currentSet.team2}
-                                </span>
-                              )}
-                              <span className="text-base font-black text-zinc-100 font-mono pl-3 w-5 text-right">
-                                {setsWon.team2}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Referee Action Button */}
-                    {status === 'active' && m.status !== 'finished' && (
-                      <button
-                        onClick={() => navigate(`/admin/match/referee/${m.id}`)}
-                        className="mt-1 flex items-center justify-center gap-1.5 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-orange-brand/50 text-white font-extrabold rounded-xl text-base uppercase tracking-wider transition-all"
+              <>
+                {courts > 1 && (
+                  <div className="flex items-center justify-between p-3 bg-zinc-950 border border-zinc-900 rounded-2xl mb-3">
+                    <span className="text-xs text-zinc-400 font-extrabold uppercase">Filtrar Programación</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-zinc-400 font-bold uppercase">Cancha:</span>
+                      <select
+                        value={selectedCourtFilter}
+                        onChange={(e) => setSelectedCourtFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                        className="px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-300 focus:outline-none focus:border-orange-brand"
                       >
-                        <Play className="w-3 h-3 fill-current text-orange-brand" />
-                        {m.status === 'in_progress' ? 'Continuar Arbitraje' : 'Iniciar Arbitraje'}
-                      </button>
-                    )}
+                        <option value="all">Todas</option>
+                        {Array.from({ length: courts }).map((_, idx) => (
+                          <option key={idx + 1} value={idx + 1}>
+                            Cancha {idx + 1}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                );
-              })
+                )}
+
+                {(() => {
+                  const filteredMatches = selectedCourtFilter === 'all'
+                    ? matches
+                    : matches.filter(m => m.court === selectedCourtFilter);
+
+                  if (filteredMatches.length === 0) {
+                    return (
+                      <div className="p-8 border border-zinc-900 border-dashed rounded-3xl text-center text-zinc-550 text-xs italic bg-zinc-950/20">
+                        No hay partidos programados en la Cancha {selectedCourtFilter}
+                      </div>
+                    );
+                  }
+
+                  return filteredMatches.map((m) => {
+                    const liveScore = m.score_json || {};
+                    const currentSet = liveScore.current_set || { team1: 0, team2: 0 };
+                    const setsWon = liveScore.sets_won || { team1: 0, team2: 0 };
+                    const prevSets = liveScore.sets || [];
+
+                    return (
+                      <div
+                        key={m.id}
+                        className={`p-4 border rounded-2xl flex flex-col gap-3 mb-3 ${
+                          m.status === 'in_progress' 
+                            ? 'bg-zinc-950 border-orange-brand/50 shadow-md shadow-orange-brand/5'
+                            : 'bg-zinc-950/40 border-zinc-900'
+                        }`}
+                      >
+                        {/* Header line info */}
+                        <div className="flex items-center justify-between border-b border-zinc-900/60 pb-2">
+                          <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">
+                            Ronda {m.round} {m.group_name ? `• ${m.group_name}` : ''} • Cancha {m.court}
+                          </span>
+                          {m.status === 'in_progress' ? (
+                            <span className="px-2.5 py-1 rounded bg-red-500/10 text-red-500 text-xs font-black border border-red-500/20 uppercase tracking-wider animate-pulse flex items-center gap-1">
+                              En Arbitraje 🔴
+                            </span>
+                          ) : m.status === 'finished' ? (
+                            <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 text-xs font-bold border border-zinc-800 uppercase tracking-wide">
+                              Finalizado
+                            </span>
+                          ) : (
+                            m.scheduled_time && (
+                              <span className="text-sm font-bold text-orange-brand font-mono">
+                                🕒 {new Date(m.scheduled_time).toLocaleDateString('es-ES', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hour12: true
+                                })}
+                              </span>
+                            )
+                          )}
+                        </div>
+
+                        {/* Team display and score */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col gap-2.5 text-left flex-grow">
+                            {/* Team 1 */}
+                            <div className="flex items-center justify-between">
+                              <span className={`text-base font-extrabold ${
+                                m.status === 'finished' && liveScore.winner_id === m.team1_id
+                                  ? 'text-orange-brand'
+                                  : 'text-zinc-200'
+                              }`}>
+                                {m.team1?.name || 'Local'}
+                              </span>
+                              {m.status !== 'pending' && (
+                                <div className="flex items-center gap-2">
+                                  {prevSets.map((set: any, idx: number) => (
+                                    <span key={idx} className="text-sm font-semibold text-zinc-500 font-mono w-5 text-center">
+                                      {set.team1}
+                                    </span>
+                                  ))}
+                                  {m.status === 'in_progress' && (
+                                    <span className="text-base font-black text-orange-brand font-mono w-5 text-center bg-orange-brand/10 rounded px-0.5">
+                                      {currentSet.team1}
+                                    </span>
+                                  )}
+                                  <span className="text-base font-black text-zinc-100 font-mono pl-3 w-5 text-right">
+                                    {setsWon.team1}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Team 2 */}
+                            <div className="flex items-center justify-between">
+                              <span className={`text-base font-extrabold ${
+                                m.status === 'finished' && liveScore.winner_id === m.team2_id
+                                  ? 'text-purple-brand'
+                                  : 'text-zinc-200'
+                              }`}>
+                                {m.team2?.name || 'Visitante'}
+                              </span>
+                              {m.status !== 'pending' && (
+                                <div className="flex items-center gap-2">
+                                  {prevSets.map((set: any, idx: number) => (
+                                    <span key={idx} className="text-sm font-semibold text-zinc-500 font-mono w-5 text-center">
+                                      {set.team2}
+                                    </span>
+                                  ))}
+                                  {m.status === 'in_progress' && (
+                                    <span className="text-base font-black text-purple-brand font-mono w-5 text-center bg-purple-brand/10 rounded px-0.5">
+                                      {currentSet.team2}
+                                    </span>
+                                  )}
+                                  <span className="text-base font-black text-zinc-100 font-mono pl-3 w-5 text-right">
+                                    {setsWon.team2}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Referee Action Button */}
+                        {status === 'active' && m.status !== 'finished' && (
+                          <button
+                            onClick={() => navigate(`/admin/match/referee/${m.id}`)}
+                            className="mt-1 flex items-center justify-center gap-1.5 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-orange-brand/50 text-white font-extrabold rounded-xl text-base uppercase tracking-wider transition-all"
+                          >
+                            <Play className="w-3 h-3 fill-current text-orange-brand" />
+                            {m.status === 'in_progress' ? 'Continuar Arbitraje' : 'Iniciar Arbitraje'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
+              </>
             )}
           </div>
         )}

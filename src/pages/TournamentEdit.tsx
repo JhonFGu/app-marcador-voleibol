@@ -71,6 +71,7 @@ export default function TournamentEdit() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [isGeneratingFixture, setIsGeneratingFixture] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
+  const [selectedCourtFilter, setSelectedCourtFilter] = useState<number | 'all'>('all');
 
   // Scheduling and Shuffling States
   const [shuffledTeams, setShuffledTeams] = useState<Team[]>([]);
@@ -1204,9 +1205,28 @@ export default function TournamentEdit() {
 
             {/* Generated Matches list */}
             <div className="flex flex-col gap-3">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 px-1 flex items-center gap-1.5">
-                Calendario Programado ({matches.length} partidos)
-              </h4>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
+                  Calendario Programado ({matches.length} partidos)
+                </h4>
+                {matches.length > 0 && courts > 1 && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase">Cancha:</span>
+                    <select
+                      value={selectedCourtFilter}
+                      onChange={(e) => setSelectedCourtFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                      className="px-2 py-1 bg-zinc-900 border border-zinc-805 rounded-lg text-[10px] font-bold text-zinc-300 focus:outline-none focus:border-orange-brand"
+                    >
+                      <option value="all">Todas</option>
+                      {Array.from({ length: courts }).map((_, idx) => (
+                        <option key={idx + 1} value={idx + 1}>
+                          Cancha {idx + 1}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
 
               {matches.length === 0 ? (
                 <div className="p-8 border border-zinc-900 border-dashed rounded-2xl text-center text-zinc-500 text-xs bg-zinc-950/10">
@@ -1214,34 +1234,48 @@ export default function TournamentEdit() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
-                  {matches.map((m) => (
-                    <div key={m.id} className="p-3 bg-zinc-950 border border-zinc-900 rounded-xl flex items-center justify-between text-left">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wide">
-                          Ronda {m.round} {m.group_name ? `• ${m.group_name}` : ''}
-                        </span>
-                        <h5 className="font-semibold text-xs text-zinc-200">
-                          {m.team1?.name || 'Equipo 1'} vs {m.team2?.name || 'Equipo 2'}
-                        </h5>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="text-[9px] font-bold font-mono bg-zinc-900 px-2 py-1 rounded text-zinc-400">
-                          Cancha {m.court}
-                        </span>
-                        {m.scheduled_time && (
-                          <span className="text-[9px] font-bold font-mono text-orange-brand flex items-center gap-1">
-                            🕒 {new Date(m.scheduled_time).toLocaleDateString('es-ES', {
-                              day: 'numeric',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true
-                            })}
+                  {(() => {
+                    const filteredMatches = selectedCourtFilter === 'all'
+                      ? matches
+                      : matches.filter(m => m.court === selectedCourtFilter);
+                    
+                    if (filteredMatches.length === 0) {
+                      return (
+                        <div className="p-6 border border-zinc-900 border-dashed rounded-2xl text-center text-zinc-650 text-[11px] italic">
+                          No hay partidos programados en la Cancha {selectedCourtFilter}
+                        </div>
+                      );
+                    }
+                    
+                    return filteredMatches.map((m) => (
+                      <div key={m.id} className="p-3 bg-zinc-950 border border-zinc-900 rounded-xl flex items-center justify-between text-left">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wide">
+                            Ronda {m.round} {m.group_name ? `• ${m.group_name}` : ''}
                           </span>
-                        )}
+                          <h5 className="font-semibold text-xs text-zinc-200">
+                            {m.team1?.name || 'Equipo 1'} vs {m.team2?.name || 'Equipo 2'}
+                          </h5>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="text-[9px] font-bold font-mono bg-zinc-900 px-2 py-1 rounded text-zinc-400">
+                            Cancha {m.court}
+                          </span>
+                          {m.scheduled_time && (
+                            <span className="text-[9px] font-bold font-mono text-orange-brand flex items-center gap-1">
+                              🕒 {new Date(m.scheduled_time).toLocaleDateString('es-ES', {
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                              })}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ));
+                  })()}
                 </div>
               )}
             </div>
