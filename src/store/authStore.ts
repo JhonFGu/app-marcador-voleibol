@@ -43,10 +43,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ isLoading: true });
     try {
       await supabase.auth.signOut();
-      set({ user: null, session: null, isLoading: false });
     } catch (e) {
       console.error('Error logging out:', e);
-      set({ isLoading: false });
+    } finally {
+      set({ user: null, session: null, isLoading: false });
     }
   },
 }));

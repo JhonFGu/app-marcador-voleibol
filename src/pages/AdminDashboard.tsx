@@ -37,10 +37,12 @@ export default function AdminDashboard() {
       if (ownErr) throw ownErr;
 
       // 2. Fetch tournaments where this user is a collaborator
-      const { data: collabData, error: collabErr } = await supabase
-        .from('tournament_collaborators')
-        .select('tournament_id, role, tournaments(*)')
-        .eq('email', user?.email?.toLowerCase());
+      const { data: collabData, error: collabErr } = user?.email
+        ? await supabase
+            .from('tournament_collaborators')
+            .select('tournament_id, role, tournaments(*)')
+            .eq('email', user.email.toLowerCase())
+        : { data: [], error: null };
 
       if (collabErr) throw collabErr;
 
@@ -51,10 +53,15 @@ export default function AdminDashboard() {
 
       const collabList: Tournament[] = (collabData || [])
         .filter(c => c.tournaments !== null)
-        .map(c => ({
-          ...(c.tournaments as any),
-          role: c.role as 'admin' | 'referee'
-        }));
+        .map(c => {
+          const t = Array.isArray(c.tournaments) ? c.tournaments[0] : c.tournaments;
+          if (!t) return null;
+          return {
+            ...t,
+            role: c.role as 'admin' | 'referee'
+          };
+        })
+        .filter((t): t is Tournament => t !== null);
 
       // Combine lists and remove duplicates
       const combined = [...ownList];
@@ -65,7 +72,11 @@ export default function AdminDashboard() {
       });
 
       // Sort by created_at descending
-      combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      combined.sort((a, b) => {
+        const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return timeB - timeA;
+      });
 
       setTournaments(combined);
     } catch (e) {
@@ -275,11 +286,11 @@ export default function AdminDashboard() {
                     </div>
                     <span className="text-sm text-zinc-500 font-mono flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-zinc-650" />
-                      {new Date(t.created_at).toLocaleDateString('es-ES', {
+                      {t.created_at ? new Date(t.created_at).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'short',
                         year: 'numeric'
-                      })}
+                      }) : 'Fecha no disponible'}
                     </span>
                   </div>
 
