@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuthStore } from '../store/authStore';
 import { 
-  ArrowLeft, Trophy, Calendar, Users, Loader2, Play, Activity, CheckCircle, Swords, Zap
+  ArrowLeft, Trophy, Calendar, Users, Loader2, Play, Activity, CheckCircle, Swords, Zap, UserPlus, Trash2
 } from 'lucide-react';
 import { generatePlayoffBracket } from '../utils/fixtureGenerator';
 import PlayoffBracket from '../components/PlayoffBracket';
@@ -51,7 +51,7 @@ export default function TournamentPlay() {
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuthStore();
 
-  const [activeTab, setActiveTab] = useState<'matches' | 'standings' | 'teams' | 'bracket'>('matches');
+  const [activeTab, setActiveTab] = useState<'matches' | 'standings' | 'teams' | 'bracket' | 'staff'>('matches');
   const [loading, setLoading] = useState(true);
   const [tournamentName, setTournamentName] = useState('');
   const [status, setStatus] = useState<'draft' | 'active' | 'finished'>('active');
@@ -78,6 +78,15 @@ export default function TournamentPlay() {
   const [playoffSetsToWin, setPlayoffSetsToWin] = useState(2);
   const [playoffOvertimeMode, setPlayoffOvertimeMode] = useState<'con_alargue' | 'a_muerte'>('con_alargue');
 
+  // Collaborators/Role states
+  const [userRole, setUserRole] = useState<'creator' | 'admin' | 'referee' | null>(null);
+  const [collaborators, setCollaborators] = useState<{ id: string, email: string, role: 'admin' | 'referee' }[]>([]);
+  const [loadingCollaborators, setLoadingCollaborators] = useState(false);
+  const [inviteAdminActive, setInviteAdminActive] = useState(false);
+  const [inviteRefereeActive, setInviteRefereeActive] = useState(false);
+  const [copyFeedbackAdmin, setCopyFeedbackAdmin] = useState(false);
+  const [copyFeedbackReferee, setCopyFeedbackReferee] = useState(false);
+
   const userId = user?.id;
 
   useEffect(() => {
@@ -101,6 +110,32 @@ export default function TournamentPlay() {
         .single();
       if (tErr) throw tErr;
 
+      // Check access role
+      let role: 'creator' | 'admin' | 'referee' | null = null;
+      if (tData.created_by === userId) {
+        role = 'creator';
+      } else {
+        const { data: collabData, error: collabErr } = await supabase
+          .from('tournament_collaborators')
+          .select('role')
+          .eq('tournament_id', id)
+          .eq('email', user?.email?.toLowerCase())
+          .maybeSingle();
+
+        if (collabErr) throw collabErr;
+        if (collabData) {
+          role = collabData.role as 'admin' | 'referee';
+        }
+      }
+
+      if (!role) {
+        alert('No tienes acceso a este torneo.');
+        navigate('/admin/dashboard');
+        return;
+      }
+
+      setUserRole(role);
+
       // If it is draft, redirect to edit
       if (tData.status === 'draft') {
         navigate(`/admin/tournament/${id}/edit`);
@@ -112,6 +147,9 @@ export default function TournamentPlay() {
       
       const config = tData.config_json || {};
       setConfigJson(config);
+      setInviteAdminActive(!!config.public_invite_admin);
+      setInviteRefereeActive(!!config.public_invite_referee);
+
       setFormat(config.format || 'league');
       setGroupCount(config.groupCount || 2);
       setCourts(config.courts || 1);
@@ -171,12 +209,93 @@ export default function TournamentPlay() {
       // 4. Calculate Standings
       calculateStandings(teamsData || [], matchesData || [], config.setsToWin || 2);
 
+      // 5. Fetch Collaborators if creator
+      if (role === 'creator') {
+        await fetchCollaborators();
+      }
+
     } catch (e) {
       console.error(e);
       alert('Error al cargar la información del torneo activo.');
       navigate('/admin/dashboard');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCollaborators = async () => {
+    if (!id) return;
+    setLoadingCollaborators(true);
+    try {
+      const { data, error } = await supabase
+        .from('tournament_collaborators')
+        .select('*')
+        .eq('tournament_id', id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setCollaborators(data || []);
+    } catch (err) {
+      console.error('Error fetching collaborators:', err);
+    } finally {
+      setLoadingCollaborators(false);
+    }
+  };
+
+  const toggleInviteLink = async (role: 'admin' | 'referee') => {
+    const isCurrentActive = role === 'admin' ? inviteAdminActive : inviteRefereeActive;
+    const nextVal = !isCurrentActive;
+    
+    if (role === 'admin') setInviteAdminActive(nextVal);
+    else setInviteRefereeActive(nextVal);
+
+    try {
+      const updatedConfig = {
+        ...configJson,
+        public_invite_admin: role === 'admin' ? nextVal : inviteAdminActive,
+        public_invite_referee: role === 'referee' ? nextVal : inviteRefereeActive,
+      };
+
+      const { error } = await supabase
+        .from('tournaments')
+        .update({ config_json: updatedConfig })
+        .eq('id', id);
+
+      if (error) throw error;
+      setConfigJson(updatedConfig);
+    } catch (e) {
+      console.error('Error updating invite toggle:', e);
+      alert('No se pudo guardar la configuración de invitación.');
+      if (role === 'admin') setInviteAdminActive(isCurrentActive);
+      else setInviteRefereeActive(isCurrentActive);
+    }
+  };
+
+  const handleDeleteCollaborator = async (collabId: string) => {
+    if (!confirm('¿Seguro que deseas eliminar a este colaborador? Ya no tendrá acceso al torneo.')) return;
+    try {
+      const { error } = await supabase
+        .from('tournament_collaborators')
+        .delete()
+        .eq('id', collabId);
+
+      if (error) throw error;
+      setCollaborators(collaborators.filter(c => c.id !== collabId));
+    } catch (err) {
+      console.error('Error deleting collaborator:', err);
+      alert('Error al eliminar colaborador.');
+    }
+  };
+
+  const handleCopyLink = (role: 'admin' | 'referee') => {
+    const joinUrl = `${window.location.origin}/admin/login?join=${role}&tournamentId=${id}`;
+    navigator.clipboard.writeText(joinUrl);
+    if (role === 'admin') {
+      setCopyFeedbackAdmin(true);
+      setTimeout(() => setCopyFeedbackAdmin(false), 2000);
+    } else {
+      setCopyFeedbackReferee(true);
+      setTimeout(() => setCopyFeedbackReferee(false), 2000);
     }
   };
 
@@ -659,7 +778,7 @@ export default function TournamentPlay() {
         </div>
 
         {/* Finish Tournament Action */}
-        {status === 'active' && (
+        {status === 'active' && userRole !== 'referee' && (
           <button
             onClick={handleFinishTournament}
             disabled={isFinishing}
@@ -671,7 +790,7 @@ export default function TournamentPlay() {
         )}
       </div>
 
-      <div className="grid grid-cols-4 p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-sm mx-auto w-full">
+      <div className={`grid ${userRole === 'creator' ? 'grid-cols-5' : 'grid-cols-4'} p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-sm mx-auto w-full`}>
         <button
           onClick={() => setActiveTab('matches')}
           className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
@@ -708,6 +827,17 @@ export default function TournamentPlay() {
           <Users className="w-3.5 h-3.5" />
           Equipos
         </button>
+        {userRole === 'creator' && (
+          <button
+            onClick={() => setActiveTab('staff')}
+            className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
+              activeTab === 'staff' ? 'bg-zinc-800 text-amber-450' : 'text-gray-400'
+            }`}
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            Staff
+          </button>
+        )}
       </div>
 
       {/* MAIN CONTAINER */}
@@ -1023,7 +1153,7 @@ export default function TournamentPlay() {
             {!playoffStarted && !hasKnockoutMatches ? (
               <div className="flex flex-col gap-4">
                 {/* Simulate button for testing */}
-                {format === 'groups' && !allGroupsFinished && status === 'active' && (
+                {format === 'groups' && !allGroupsFinished && status === 'active' && userRole !== 'referee' && (
                   <button
                     onClick={handleSimulateAllMatches}
                     disabled={isSimulating}
@@ -1043,14 +1173,28 @@ export default function TournamentPlay() {
                     <span className="text-zinc-500 text-xs">
                       ⏳ La fase de grupos aún no ha terminado.
                     </span>
-                    <span className="text-zinc-600 text-[10px]">
-                      Faltan {groupMatches.filter(m => m.status !== 'finished').length} partido(s) por finalizar.
+                    <span className="text-zinc-650 text-[10px]">
+                      {userRole === 'referee'
+                        ? 'Una vez finalizados todos los partidos, el administrador generará las llaves.'
+                        : `Faltan ${groupMatches.filter(m => m.status !== 'finished').length} partido(s) por finalizar.`}
+                    </span>
+                  </div>
+                )}
+
+                {/* Referee waiting message */}
+                {allGroupsFinished && status === 'active' && userRole === 'referee' && (
+                  <div className="p-6 border border-zinc-900 border-dashed rounded-3xl text-center flex flex-col gap-2 bg-zinc-950/20">
+                    <span className="text-zinc-500 text-xs">
+                      ⏳ Esperando generación de llaves
+                    </span>
+                    <span className="text-zinc-650 text-[10px]">
+                      El creador o administrador del torneo debe iniciar la fase de playoffs.
                     </span>
                   </div>
                 )}
 
                 {/* Playoff rules configuration */}
-                {allGroupsFinished && status === 'active' && (
+                {allGroupsFinished && status === 'active' && userRole !== 'referee' && (
                   <div className="flex flex-col gap-4">
                     <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-2xl flex flex-col gap-4">
                       <h3 className="text-sm font-extrabold text-amber-400 flex items-center gap-2">
@@ -1185,11 +1329,140 @@ export default function TournamentPlay() {
               <PlayoffBracket
                 matches={matches}
                 teams={teams}
-                isAdmin={true}
+                isAdmin={userRole !== 'referee'}
                 tournamentActive={status === 'active'}
                 onStartMatch={(matchId) => navigate(`/admin/match/referee/${matchId}`)}
               />
             )}
+          </div>
+        )}
+
+        {/* TAB 5: STAFF */}
+        {activeTab === 'staff' && userRole === 'creator' && (
+          <div className="flex flex-col gap-5">
+            {/* Admin Invite Card */}
+            <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-3xl flex flex-col gap-3">
+              <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
+                <div>
+                  <h4 className="text-sm font-extrabold text-zinc-200">Invitación de Administradores</h4>
+                  <p className="text-[10px] text-zinc-500">Pueden editar reglas, equipos y marcadores.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleInviteLink('admin')}
+                  className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all ${
+                    inviteAdminActive
+                      ? 'bg-emerald-500/10 text-emerald-450 border border-emerald-500/20'
+                      : 'bg-zinc-900 text-zinc-500 border border-zinc-800'
+                  }`}
+                >
+                  {inviteAdminActive ? 'Activo' : 'Inactivo'}
+                </button>
+              </div>
+
+              {inviteAdminActive ? (
+                <div className="flex flex-col gap-2 mt-1">
+                  <span className="text-[10px] text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
+                    {`${window.location.origin}/admin/login?join=admin&tournamentId=${id}`}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyLink('admin')}
+                    className="py-2.5 bg-zinc-900 border border-zinc-800 hover:text-white text-zinc-350 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
+                  >
+                    {copyFeedbackAdmin ? '✅ ¡Copiado!' : 'Copiar Enlace'}
+                  </button>
+                </div>
+              ) : (
+                <p className="text-[11px] text-zinc-500 text-center py-2 italic">
+                  Habilita el enlace para que otros puedan unirse como Administradores.
+                </p>
+              )}
+            </div>
+
+            {/* Referee Invite Card */}
+            <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-3xl flex flex-col gap-3">
+              <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
+                <div>
+                  <h4 className="text-sm font-extrabold text-zinc-200">Invitación de Árbitros</h4>
+                  <p className="text-[10px] text-zinc-500">Sólo pueden registrar resultados y arbitrar partidos.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleInviteLink('referee')}
+                  className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all ${
+                    inviteRefereeActive
+                      ? 'bg-emerald-500/10 text-emerald-450 border border-emerald-500/20'
+                      : 'bg-zinc-900 text-zinc-500 border border-zinc-800'
+                  }`}
+                >
+                  {inviteRefereeActive ? 'Activo' : 'Inactivo'}
+                </button>
+              </div>
+
+              {inviteRefereeActive ? (
+                <div className="flex flex-col gap-2 mt-1">
+                  <span className="text-[10px] text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
+                    {`${window.location.origin}/admin/login?join=referee&tournamentId=${id}`}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyLink('referee')}
+                    className="py-2.5 bg-zinc-900 border border-zinc-800 hover:text-white text-zinc-350 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all"
+                  >
+                    {copyFeedbackReferee ? '✅ ¡Copiado!' : 'Copiar Enlace'}
+                  </button>
+                </div>
+              ) : (
+                <p className="text-[11px] text-zinc-500 text-center py-2 italic">
+                  Habilita el enlace para que otros puedan unirse como Árbitros.
+                </p>
+              )}
+            </div>
+
+            {/* Current Staff List Card */}
+            <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-3xl flex flex-col gap-3">
+              <h4 className="text-sm font-extrabold text-zinc-200 border-b border-zinc-900 pb-2">
+                Staff Actual ({collaborators.length})
+              </h4>
+              
+              {loadingCollaborators ? (
+                <div className="text-center py-6 text-zinc-500 text-xs flex items-center justify-center gap-1.5">
+                  <Loader2 className="w-4 h-4 animate-spin text-orange-brand" />
+                  Cargando staff...
+                </div>
+              ) : collaborators.length === 0 ? (
+                <p className="text-[11px] text-zinc-500 text-center py-4 italic">
+                  Aún no hay colaboradores en este torneo. Comparte un enlace arriba para agregarlos.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-1">
+                  {collaborators.map((collab) => (
+                    <div
+                      key={collab.id}
+                      className="p-3 bg-zinc-900/40 border border-zinc-850 rounded-2xl flex items-center justify-between text-left"
+                    >
+                      <div className="flex flex-col gap-0.5 max-w-[70%]">
+                        <span className="text-xs font-bold text-zinc-200 truncate">{collab.email}</span>
+                        <span className={`text-[9px] font-black uppercase tracking-wider font-mono ${
+                          collab.role === 'admin' ? 'text-orange-brand' : 'text-blue-400'
+                        }`}>
+                          {collab.role === 'admin' ? 'Administrador' : 'Árbitro'}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCollaborator(collab.id)}
+                        className="p-2 rounded-xl bg-zinc-950 hover:bg-red-950/30 text-zinc-650 hover:text-red-500 transition-colors"
+                        title="Eliminar del Staff"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

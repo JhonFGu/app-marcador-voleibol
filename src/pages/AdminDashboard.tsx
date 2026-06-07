@@ -10,6 +10,7 @@ interface Tournament {
   status: 'draft' | 'active' | 'finished';
   config_json: any;
   created_at: string;
+  role?: 'creator' | 'admin' | 'referee';
 }
 
 export default function AdminDashboard() {
@@ -27,14 +28,46 @@ export default function AdminDashboard() {
   const fetchTournaments = async (userId: string) => {
     setLoadingList(true);
     try {
-      const { data, error } = await supabase
+      // 1. Fetch tournaments created by this user
+      const { data: ownData, error: ownErr } = await supabase
         .from('tournaments')
         .select('*')
-        .eq('created_by', userId)
-        .order('created_at', { ascending: false });
+        .eq('created_by', userId);
 
-      if (error) throw error;
-      setTournaments(data || []);
+      if (ownErr) throw ownErr;
+
+      // 2. Fetch tournaments where this user is a collaborator
+      const { data: collabData, error: collabErr } = await supabase
+        .from('tournament_collaborators')
+        .select('tournament_id, role, tournaments(*)')
+        .eq('email', user?.email?.toLowerCase());
+
+      if (collabErr) throw collabErr;
+
+      const ownList: Tournament[] = (ownData || []).map(t => ({
+        ...t,
+        role: 'creator'
+      }));
+
+      const collabList: Tournament[] = (collabData || [])
+        .filter(c => c.tournaments !== null)
+        .map(c => ({
+          ...(c.tournaments as any),
+          role: c.role as 'admin' | 'referee'
+        }));
+
+      // Combine lists and remove duplicates
+      const combined = [...ownList];
+      collabList.forEach(ct => {
+        if (!combined.some(t => t.id === ct.id)) {
+          combined.push(ct);
+        }
+      });
+
+      // Sort by created_at descending
+      combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      setTournaments(combined);
     } catch (e) {
       console.error('Error fetching tournaments:', e);
     } finally {
@@ -120,6 +153,31 @@ export default function AdminDashboard() {
       </div>
     );
   }
+
+  const getRoleBadge = (role?: Tournament['role']) => {
+    switch (role) {
+      case 'creator':
+        return (
+          <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase font-mono">
+            Creador
+          </span>
+        );
+      case 'admin':
+        return (
+          <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-orange-brand/10 text-orange-brand border border-orange-brand/20 uppercase font-mono">
+            Admin
+          </span>
+        );
+      case 'referee':
+        return (
+          <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase font-mono">
+            Árbitro
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
 
   const getStatusBadge = (status: Tournament['status']) => {
     switch (status) {
@@ -210,9 +268,10 @@ export default function AdminDashboard() {
                   className="p-4 bg-zinc-950 border border-zinc-900 rounded-2xl hover:border-zinc-800 transition-colors flex items-center justify-between group"
                 >
                   <div className="flex flex-col gap-1 text-left max-w-[70%]">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="font-bold text-base text-zinc-150 truncate max-w-[150px]">{t.name}</h4>
                       {getStatusBadge(t.status)}
+                      {getRoleBadge(t.role)}
                     </div>
                     <span className="text-sm text-zinc-500 font-mono flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-zinc-650" />
@@ -226,21 +285,23 @@ export default function AdminDashboard() {
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => navigate(t.status === 'draft' ? `/admin/tournament/${t.id}/edit` : `/admin/tournament/${t.id}/play`)}
+                      onClick={() => navigate(t.role === 'referee' ? `/admin/tournament/${t.id}/play` : (t.status === 'draft' ? `/admin/tournament/${t.id}/edit` : `/admin/tournament/${t.id}/play`))}
                       className="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition-colors flex items-center justify-center"
                       title="Entrar"
                     >
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                     
-                    <button
-                      onClick={() => handleDelete(t.id)}
-                      disabled={deletingId === t.id}
-                      className="p-2.5 rounded-xl bg-zinc-900 hover:bg-red-950/30 text-zinc-650 hover:text-red-500 transition-colors flex items-center justify-center disabled:opacity-50"
-                      title="Eliminar"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {t.role === 'creator' && (
+                      <button
+                        onClick={() => handleDelete(t.id)}
+                        disabled={deletingId === t.id}
+                        className="p-2.5 rounded-xl bg-zinc-900 hover:bg-red-950/30 text-zinc-650 hover:text-red-500 transition-colors flex items-center justify-center disabled:opacity-50"
+                        title="Eliminar"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
