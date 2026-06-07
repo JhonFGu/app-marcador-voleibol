@@ -27,7 +27,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
   checkUser: async () => {
     set({ isLoading: true });
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      // Race session check with a 5 second timeout to prevent hanging on expired refresh tokens
+      const sessionPromise = supabase.auth.getSession();
+      const timeoutPromise = new Promise<{ data: { session: null } }>((_, reject) => 
+        setTimeout(() => reject(new Error('Session fetch timeout')), 5000)
+      );
+
+      const res = await Promise.race([sessionPromise, timeoutPromise]);
+      const session = res?.data?.session ?? null;
+
       set({
         session,
         user: session?.user ?? null,
@@ -42,11 +50,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
   logout: async () => {
     set({ isLoading: true });
     try {
-      await supabase.auth.signOut();
+      // Clear state locally first to update UI instantly
+      set({ user: null, session: null, isLoading: false });
+      // Call signOut in the background
+      supabase.auth.signOut().catch((e) => {
+        console.error('Error in background signOut:', e);
+      });
     } catch (e) {
       console.error('Error logging out:', e);
-    } finally {
-      set({ user: null, session: null, isLoading: false });
+      set({ isLoading: false });
     }
   },
 }));
