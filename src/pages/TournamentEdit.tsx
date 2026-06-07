@@ -155,8 +155,13 @@ export default function TournamentEdit() {
       }
 
       if (role === 'referee') {
-        alert('Tu rol de Árbitro sólo permite registrar marcadores. Redirigiendo...');
-        navigate(`/admin/tournament/${id}/play`);
+        if (tData.status === 'draft') {
+          alert('El torneo aún está en borrador y no ha comenzado.');
+          navigate('/admin/dashboard');
+        } else {
+          alert('Tu rol de Árbitro sólo permite registrar marcadores. Redirigiendo...');
+          navigate(`/admin/tournament/${id}/play`);
+        }
         return;
       }
 

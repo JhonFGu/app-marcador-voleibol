@@ -285,7 +285,13 @@ export default function AdminDashboard() {
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => navigate(t.role === 'referee' ? `/admin/tournament/${t.id}/play` : (t.status === 'draft' ? `/admin/tournament/${t.id}/edit` : `/admin/tournament/${t.id}/play`))}
+                      onClick={() => {
+                        if (t.role === 'referee' && t.status === 'draft') {
+                          alert('El torneo aún está en borrador y no ha comenzado.');
+                          return;
+                        }
+                        navigate(t.role === 'referee' ? `/admin/tournament/${t.id}/play` : (t.status === 'draft' ? `/admin/tournament/${t.id}/edit` : `/admin/tournament/${t.id}/play`));
+                      }}
                       className="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition-colors flex items-center justify-center"
                       title="Entrar"
                     >

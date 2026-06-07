@@ -122,8 +122,13 @@ export default function TournamentPlay() {
 
       setUserRole(role);
 
-      // If it is draft, redirect to edit
+      // If it is draft, redirect to edit or dashboard if referee
       if (tData.status === 'draft') {
+        if (role === 'referee') {
+          alert('El torneo aún está en borrador y no ha comenzado.');
+          navigate('/admin/dashboard');
+          return;
+        }
         navigate(`/admin/tournament/${id}/edit`);
         return;
       }
