@@ -71,12 +71,14 @@ export default function RefScoreboard() {
 
       // 2. Extract configuration from tournament
       const tConfig = matchData.tournament.config_json || {};
+      const isKnockout = matchData.match_type === 'knockout';
+      const pRules = tConfig.playoffRules || {};
       const matchConfig = {
-        setsToWin: tConfig.setsToWin || 2,
-        regularPoints: tConfig.regularPoints || 25,
-        tiebreakPoints: tConfig.tiebreakPoints || 15,
+        setsToWin: isKnockout && pRules.setsToWin ? pRules.setsToWin : (tConfig.setsToWin || 2),
+        regularPoints: isKnockout && pRules.regularPoints ? pRules.regularPoints : (tConfig.regularPoints || 25),
+        tiebreakPoints: isKnockout && pRules.tiebreakPoints ? pRules.tiebreakPoints : (tConfig.tiebreakPoints || 15),
         modality: tConfig.modality || '6v6',
-        overtimeMode: tConfig.overtimeMode || 'con_alargue'
+        overtimeMode: isKnockout && pRules.overtimeMode ? pRules.overtimeMode : (tConfig.overtimeMode || 'con_alargue')
       };
 
       const localTeam1 = { id: matchData.team1_id, name: matchData.team1?.name || 'Local' };
@@ -172,6 +174,49 @@ export default function RefScoreboard() {
 
       if (error) {
         console.error('Error syncing match score to Supabase:', error);
+      }
+
+      // Auto-promote winner to next bracket match for knockout matches
+      if (matchWinnerId && tournamentId) {
+        try {
+          // Get the current match details
+          const { data: currentMatch } = await supabase
+            .from('matches')
+            .select('*')
+            .eq('id', matchId)
+            .single();
+
+          if (currentMatch && currentMatch.match_type === 'knockout') {
+            const currentRound = currentMatch.round;
+            const currentPosition = currentMatch.score_json?.bracket_position ?? currentMatch.bracket_position ?? 0;
+            const nextPosition = Math.floor(currentPosition / 2);
+            const isTopSlot = currentPosition % 2 === 0; // even = feeds into team1, odd = feeds into team2
+
+            // Find the next round match at the correct bracket position
+            const { data: nextRoundMatches } = await supabase
+              .from('matches')
+              .select('*')
+              .eq('tournament_id', tournamentId)
+              .eq('match_type', 'knockout')
+              .eq('round', currentRound + 1);
+
+            if (nextRoundMatches && nextRoundMatches.length > 0) {
+              const nextMatch = nextRoundMatches.find(
+                nm => (nm.score_json?.bracket_position ?? nm.bracket_position) === nextPosition
+              );
+              if (nextMatch) {
+                const updateField = isTopSlot ? 'team1_id' : 'team2_id';
+                
+                await supabase
+                  .from('matches')
+                  .update({ [updateField]: matchWinnerId })
+                  .eq('id', nextMatch.id);
+              }
+            }
+          }
+        } catch (promoteErr) {
+          console.error('Error promoting winner to next round:', promoteErr);
+        }
       }
     };
 
