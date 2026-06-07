@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { ArrowLeft, Trophy, Calendar, Users, Loader2, Play, Swords } from 'lucide-react';
-import PlayoffBracket from '../components/PlayoffBracket';
+import { ArrowLeft, Trophy, Calendar, Users, Loader2, Play } from 'lucide-react';
 
 interface Team {
   id: string;
@@ -46,7 +45,7 @@ export default function PublicTournament() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<'matches' | 'standings' | 'teams' | 'bracket'>('matches');
+  const [activeTab, setActiveTab] = useState<'matches' | 'standings' | 'teams'>('matches');
   const [loading, setLoading] = useState(true);
   const [tournamentName, setTournamentName] = useState('');
   const [format, setFormat] = useState<'league' | 'groups'>('league');
@@ -346,10 +345,10 @@ export default function PublicTournament() {
       </div>
 
       {/* Tabs */}
-      <div className="grid grid-cols-4 p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-sm mx-auto w-full">
+      <div className="grid grid-cols-3 p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-sm mx-auto w-full">
         <button
           onClick={() => setActiveTab('matches')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
+          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'matches' ? 'bg-zinc-800 text-orange-brand' : 'text-gray-400'
           }`}
         >
@@ -358,25 +357,16 @@ export default function PublicTournament() {
         </button>
         <button
           onClick={() => setActiveTab('standings')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
+          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'standings' ? 'bg-zinc-800 text-purple-brand' : 'text-gray-400'
           }`}
         >
           <Trophy className="w-3.5 h-3.5" />
-          Tabla
-        </button>
-        <button
-          onClick={() => setActiveTab('bracket')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
-            activeTab === 'bracket' ? 'bg-zinc-800 text-amber-400' : 'text-gray-400'
-          }`}
-        >
-          <Swords className="w-3.5 h-3.5" />
-          Llaves
+          Posiciones
         </button>
         <button
           onClick={() => setActiveTab('teams')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1 transition-all ${
+          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'teams' ? 'bg-zinc-800 text-zinc-200' : 'text-gray-400'
           }`}
         >
@@ -661,18 +651,6 @@ export default function PublicTournament() {
                 </div>
               ))
             )}
-          </div>
-        )}
-
-        {/* Tab 4: Bracket / Llaves */}
-        {activeTab === 'bracket' && (
-          <div className="flex flex-col gap-4">
-            <PlayoffBracket
-              matches={matches}
-              teams={teams}
-              isAdmin={false}
-              tournamentActive={false}
-            />
           </div>
         )}
 
