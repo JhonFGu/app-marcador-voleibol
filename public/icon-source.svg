@@ -1,45 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="bgGlow" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#F97316"/>
-      <stop offset="100%" stop-color="#A855F7"/>
-    </linearGradient>
-    <clipPath id="roundedBg">
-      <rect x="32" y="32" width="448" height="448" rx="100"/>
-    </clipPath>
-  </defs>
+  <!-- Background - fills entire canvas -->
+  <rect x="0" y="0" width="512" height="512" rx="110" fill="#0A0A0A"/>
 
-  <!-- Dark background with rounded corners -->
-  <rect x="32" y="32" width="448" height="448" rx="100" fill="#0A0A0A"/>
+  <!-- ===== VOLLEYBALL - 6-panel classic design ===== -->
+  <g transform="translate(256, 128)">
+    <!-- Translucent white fill for depth -->
+    <circle cx="0" cy="0" r="78" fill="#FFFFFF" opacity="0.12"/>
 
-  <g clip-path="url(#roundedBg)">
+    <!-- Outer circle -->
+    <circle cx="0" cy="0" r="78" fill="none" stroke="#FFFFFF" stroke-width="8" opacity="0.95"/>
 
-    <!-- Subtle brand gradient at very low opacity -->
-    <rect x="32" y="32" width="448" height="448" fill="url(#bgGlow)" opacity="0.15"/>
+    <!-- 3 panel curves (6-panel classic volleyball) -->
+    <!-- Curve 1: upper-left to lower-right -->
+    <path d="M -68 -38 C -55 -22, -25 -8, 0 0 C 25 8, 55 22, 68 38"
+          fill="none" stroke="#FFFFFF" stroke-width="5.5" opacity="0.85"/>
 
-    <!-- ===== VOLLEYBALL at top center ===== -->
-    <g transform="translate(256, 120)">
-      <!-- Outer circle -->
-      <circle cx="0" cy="0" r="52" fill="none" stroke="#FFFFFF" stroke-width="7" opacity="0.9"/>
+    <!-- Curve 2: upper-right to lower-left -->
+    <path d="M 68 -38 C 55 -22, 25 -8, 0 0 C -25 8, -55 22, -68 38"
+          fill="none" stroke="#FFFFFF" stroke-width="5.5" opacity="0.85"/>
 
-      <!-- Panel curves (6-panel volleyball) -->
-      <path d="M -45 -26 Q 0 0 45 26"   fill="none" stroke="#FFFFFF" stroke-width="5" opacity="0.7"/>
-      <path d="M 45 -26 Q 0 0 -45 26"   fill="none" stroke="#FFFFFF" stroke-width="5" opacity="0.7"/>
-      <path d="M 0 -52 Q -10 0 0 52"    fill="none" stroke="#FFFFFF" stroke-width="5" opacity="0.7"/>
-    </g>
+    <!-- Curve 3: top to bottom (vertical S-curve) -->
+    <path d="M 0 -78 C -12 -52, 10 -26, 0 0 C -10 26, 12 52, 0 78"
+          fill="none" stroke="#FFFFFF" stroke-width="5.5" opacity="0.85"/>
+  </g>
 
-    <!-- ===== TWO SCORE PANELS ===== -->
-    <!-- Left panel (Local - Orange) -->
-    <g transform="translate(0, 0)">
-      <rect x="80" y="220" width="168" height="200" rx="24" fill="#F97316"/>
-      <text x="164" y="362" font-family="monospace" font-size="140" font-weight="bold" fill="#FFFFFF" text-anchor="middle">00</text>
-    </g>
+  <!-- ===== SCORE PANELS ===== -->
+  <!-- Left panel (Local - Orange #F97316) -->
+  <g>
+    <rect x="30" y="222" width="218" height="248" rx="30" fill="#F97316"/>
+    <text x="139" y="370" font-family="monospace" font-size="170" font-weight="bold" fill="#FFFFFF" text-anchor="middle">00</text>
+  </g>
 
-    <!-- Right panel (Visitor - Purple) -->
-    <g transform="translate(0, 0)">
-      <rect x="264" y="220" width="168" height="200" rx="24" fill="#A855F7"/>
-      <text x="348" y="362" font-family="monospace" font-size="140" font-weight="bold" fill="#FFFFFF" text-anchor="middle">00</text>
-    </g>
-
+  <!-- Right panel (Visitor - Purple #A855F7) -->
+  <g>
+    <rect x="264" y="222" width="218" height="248" rx="30" fill="#A855F7"/>
+    <text x="373" y="370" font-family="monospace" font-size="170" font-weight="bold" fill="#FFFFFF" text-anchor="middle">00</text>
   </g>
 </svg>
