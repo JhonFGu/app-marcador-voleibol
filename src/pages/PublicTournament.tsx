@@ -339,8 +339,8 @@ export default function PublicTournament() {
           <ArrowLeft className="w-4 h-4 text-gray-300" />
         </button>
         <div>
-          <h1 className="font-extrabold text-sm truncate max-w-[200px]">{tournamentName}</h1>
-          <span className="text-[10px] text-purple-brand font-bold uppercase tracking-wider">Tablero del Espectador</span>
+          <h1 className="font-extrabold text-xl truncate max-w-[200px]">{tournamentName}</h1>
+          <span className="text-xs text-purple-brand font-bold uppercase tracking-wider">Tablero del Espectador</span>
         </div>
       </div>
 
@@ -348,7 +348,7 @@ export default function PublicTournament() {
       <div className="grid grid-cols-3 p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-sm mx-auto w-full">
         <button
           onClick={() => setActiveTab('matches')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'matches' ? 'bg-zinc-800 text-orange-brand' : 'text-gray-400'
           }`}
         >
@@ -357,7 +357,7 @@ export default function PublicTournament() {
         </button>
         <button
           onClick={() => setActiveTab('standings')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'standings' ? 'bg-zinc-800 text-purple-brand' : 'text-gray-400'
           }`}
         >
@@ -366,7 +366,7 @@ export default function PublicTournament() {
         </button>
         <button
           onClick={() => setActiveTab('teams')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'teams' ? 'bg-zinc-800 text-zinc-200' : 'text-gray-400'
           }`}
         >
@@ -412,12 +412,12 @@ export default function PublicTournament() {
 
                     return sortedGroups.map(groupName => (
                       <div key={groupName} className="p-3 bg-zinc-900/60 border border-zinc-850 rounded-xl flex flex-col gap-1.5">
-                        <span className="text-[10px] font-black text-zinc-300 uppercase border-b border-zinc-800 pb-1">
+                        <span className="text-xs font-black text-zinc-300 uppercase border-b border-zinc-800 pb-1">
                           {groupName}
                         </span>
                         <div className="flex flex-col gap-0.5">
                           {teamMapByGroup[groupName].sort((a, b) => a.name.localeCompare(b.name)).map((team, idx) => (
-                            <span key={team.id} className="text-[11px] font-medium text-zinc-450 truncate">
+                            <span key={team.id} className="text-xs font-medium text-zinc-450 truncate">
                               {idx + 1}. {team.name}
                             </span>
                           ))}
@@ -639,7 +639,7 @@ export default function PublicTournament() {
                   </h4>
                   <div className="grid grid-cols-2 gap-2">
                     {teamRosters[t.id]?.length === 0 ? (
-                      <p className="text-[10px] text-zinc-650 italic col-span-2">Sin jugadores asignados</p>
+                      <p className="text-2xs text-zinc-650 italic col-span-2">Sin jugadores asignados</p>
                     ) : (
                       teamRosters[t.id]?.map(p => (
                         <div key={p.id} className="bg-zinc-900/40 p-2 rounded-xl border border-zinc-850/50 text-left text-xs font-semibold text-zinc-350">

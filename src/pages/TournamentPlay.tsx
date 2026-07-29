@@ -501,8 +501,8 @@ export default function TournamentPlay() {
             <ArrowLeft className="w-4 h-4 text-gray-300" />
           </button>
           <div>
-            <h1 className="font-extrabold text-sm truncate max-w-[150px]">{tournamentName}</h1>
-            <span className={`text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+            <h1 className="font-extrabold text-xl truncate max-w-[150px]">{tournamentName}</h1>
+            <span className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1 ${
               status === 'active' ? 'text-emerald-400' : 'text-blue-400'
             }`}>
               <Activity className="w-2.5 h-2.5" />
@@ -516,7 +516,7 @@ export default function TournamentPlay() {
           <button
             onClick={handleFinishTournament}
             disabled={isFinishing}
-            className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-red-600 to-amber-600 text-white font-bold rounded-xl text-[10px] uppercase tracking-wider disabled:opacity-40"
+            className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-red-600 to-amber-600 text-white font-bold rounded-xl text-sm uppercase tracking-wider disabled:opacity-40"
           >
             {isFinishing ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
             Finalizar Torneo
@@ -528,7 +528,7 @@ export default function TournamentPlay() {
       <div className={`grid ${userRole === 'creator' ? 'grid-cols-4' : 'grid-cols-3'} p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-sm mx-auto w-full`}>
         <button
           onClick={() => setActiveTab('matches')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'matches' ? 'bg-zinc-800 text-orange-brand' : 'text-gray-400'
           }`}
         >
@@ -537,7 +537,7 @@ export default function TournamentPlay() {
         </button>
         <button
           onClick={() => setActiveTab('standings')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'standings' ? 'bg-zinc-800 text-purple-brand' : 'text-gray-400'
           }`}
         >
@@ -546,7 +546,7 @@ export default function TournamentPlay() {
         </button>
         <button
           onClick={() => setActiveTab('teams')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'teams' ? 'bg-zinc-800 text-zinc-200' : 'text-gray-400'
           }`}
         >
@@ -603,12 +603,12 @@ export default function TournamentPlay() {
 
                     return sortedGroups.map(groupName => (
                       <div key={groupName} className="p-3 bg-zinc-900/60 border border-zinc-850 rounded-xl flex flex-col gap-1.5">
-                        <span className="text-[10px] font-black text-zinc-300 uppercase border-b border-zinc-800 pb-1">
+                        <span className="text-xs font-black text-zinc-300 uppercase border-b border-zinc-800 pb-1">
                           {groupName}
                         </span>
                         <div className="flex flex-col gap-0.5">
                           {teamMapByGroup[groupName].sort((a, b) => a.name.localeCompare(b.name)).map((team, idx) => (
-                            <span key={team.id} className="text-[11px] font-medium text-zinc-450 truncate">
+                            <span key={team.id} className="text-xs font-medium text-zinc-450 truncate">
                               {idx + 1}. {team.name}
                             </span>
                           ))}
@@ -630,11 +630,11 @@ export default function TournamentPlay() {
                   <div className="flex items-center justify-between p-3 bg-zinc-950 border border-zinc-900 rounded-2xl mb-3">
                     <span className="text-xs text-zinc-400 font-extrabold uppercase">Filtrar Programación</span>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] text-zinc-400 font-bold uppercase">Cancha:</span>
+                      <span className="text-xs text-zinc-400 font-bold uppercase">Cancha:</span>
                       <select
                         value={selectedCourtFilter}
                         onChange={(e) => setSelectedCourtFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-                        className="px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-[10px] font-bold text-zinc-300 focus:outline-none focus:border-orange-brand"
+                        className="px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-bold text-zinc-300 focus:outline-none focus:border-orange-brand"
                       >
                         <option value="all">Todas</option>
                         {Array.from({ length: courts }).map((_, idx) => (
@@ -881,12 +881,12 @@ export default function TournamentPlay() {
               <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
                 <div>
                   <h4 className="text-sm font-extrabold text-zinc-200">Invitación de Administradores</h4>
-                  <p className="text-[10px] text-zinc-500">Pueden editar reglas, equipos y marcadores.</p>
+                  <p className="text-xs text-zinc-500">Pueden editar reglas, equipos y marcadores.</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => toggleInviteLink('admin')}
-                  className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all ${
                     inviteAdminActive
                       ? 'bg-emerald-500/10 text-emerald-450 border border-emerald-500/20'
                       : 'bg-zinc-900 text-zinc-500 border border-zinc-800'
@@ -898,7 +898,7 @@ export default function TournamentPlay() {
 
               {inviteAdminActive ? (
                 <div className="flex flex-col gap-2 mt-1">
-                  <span className="text-[10px] text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
+                  <span className="text-xs text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
                     {`${window.location.origin}/admin/login?join=admin&tournamentId=${id}`}
                   </span>
                   <button
@@ -910,7 +910,7 @@ export default function TournamentPlay() {
                   </button>
                 </div>
               ) : (
-                <p className="text-[11px] text-zinc-550 text-center py-2 italic">
+                <p className="text-2xs text-zinc-550 text-center py-2 italic">
                   Habilita el enlace para que otros puedan unirse como Administradores.
                 </p>
               )}
@@ -921,12 +921,12 @@ export default function TournamentPlay() {
               <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
                 <div>
                   <h4 className="text-sm font-extrabold text-zinc-200">Invitación de Árbitros</h4>
-                  <p className="text-[10px] text-zinc-500">Sólo pueden registrar resultados y arbitrar partidos.</p>
+                  <p className="text-xs text-zinc-500">Sólo pueden registrar resultados y arbitrar partidos.</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => toggleInviteLink('referee')}
-                  className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all ${
                     inviteRefereeActive
                       ? 'bg-emerald-500/10 text-emerald-450 border border-emerald-500/20'
                       : 'bg-zinc-900 text-zinc-500 border border-zinc-800'
@@ -938,7 +938,7 @@ export default function TournamentPlay() {
 
               {inviteRefereeActive ? (
                 <div className="flex flex-col gap-2 mt-1">
-                  <span className="text-[10px] text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
+                  <span className="text-xs text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
                     {`${window.location.origin}/admin/login?join=referee&tournamentId=${id}`}
                   </span>
                   <button
@@ -950,7 +950,7 @@ export default function TournamentPlay() {
                   </button>
                 </div>
               ) : (
-                <p className="text-[11px] text-zinc-550 text-center py-2 italic">
+                <p className="text-2xs text-zinc-550 text-center py-2 italic">
                   Habilita el enlace para que otros puedan unirse como Árbitros.
                 </p>
               )}
@@ -968,7 +968,7 @@ export default function TournamentPlay() {
                   Cargando staff...
                 </div>
               ) : collaborators.length === 0 ? (
-                <p className="text-[11px] text-zinc-550 text-center py-4 italic">
+                <p className="text-2xs text-zinc-550 text-center py-4 italic">
                   Aún no hay colaboradores en este torneo. Comparte un enlace arriba para agregarlos.
                 </p>
               ) : (
@@ -980,7 +980,7 @@ export default function TournamentPlay() {
                     >
                       <div className="flex flex-col gap-0.5 max-w-[70%]">
                         <span className="text-xs font-bold text-zinc-200 truncate">{collab.email}</span>
-                        <span className={`text-[9px] font-black uppercase tracking-wider font-mono ${
+                        <span className={`text-2xs font-black uppercase tracking-wider font-mono ${
                           collab.role === 'admin' ? 'text-orange-brand' : 'text-blue-400'
                         }`}>
                           {collab.role === 'admin' ? 'Administrador' : 'Árbitro'}

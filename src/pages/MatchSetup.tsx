@@ -53,7 +53,7 @@ export default function MatchSetup() {
           <ArrowLeft className="w-5 h-5 text-gray-300" />
         </button>
         <div>
-          <h2 className="text-[22px] font-extrabold">Configuración</h2>
+          <h2 className="text-xl font-extrabold">Configuración</h2>
           <p className="text-sm text-gray-400">Nuevo Partido Simple (Sin login)</p>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function MatchSetup() {
       <form onSubmit={handleStart} className="flex flex-col flex-grow gap-5 max-w-sm mx-auto w-full">
         {/* Team Names */}
         <div className="flex flex-col gap-3 p-4 bg-zinc-900/60 border border-zinc-850 rounded-2xl">
-          <h3 className="text-base font-bold text-gray-300 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-gray-300 flex items-center gap-2">
             <Settings className="w-4 h-4 text-orange-brand" />
             Nombres de los Equipos
           </h3>
@@ -90,7 +90,7 @@ export default function MatchSetup() {
 
         {/* Match Rules */}
         <div className="flex flex-col gap-4 p-4 bg-zinc-900/60 border border-zinc-850 rounded-2xl">
-          <h3 className="text-base font-bold text-gray-300">Reglamento del Partido</h3>
+          <h3 className="text-lg font-bold text-gray-300">Reglamento del Partido</h3>
 
           {/* Sets to win */}
           <div className="flex flex-col gap-2">

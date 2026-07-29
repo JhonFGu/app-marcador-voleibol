@@ -229,7 +229,7 @@ export default function PublicLiveMatch() {
 
       return (
         <div className={`bg-zinc-900/60 py-1.5 rounded-lg text-xs font-bold border relative flex flex-col items-center justify-center min-h-[42px] transition-all ${borderClass} ${textClass}`}>
-          <span className="block text-[7px] text-zinc-550 font-sans uppercase tracking-wider">{label}</span>
+          <span className="block text-2xs text-zinc-550 font-sans uppercase tracking-wider">{label}</span>
           <span className="text-sm font-black">{playerNum}</span>
           {isServer && showBall && (
             <span className={`absolute ${isLeft ? 'right-1.5' : 'left-1.5'} bottom-1 text-[9px] animate-pulse`}>🏐</span>
@@ -241,7 +241,7 @@ export default function PublicLiveMatch() {
     return (
       <div className="px-4 pb-4 w-full max-w-xl mx-auto z-0">
         <div className="bg-zinc-950/60 border border-zinc-900 rounded-2xl p-3">
-          <span className="text-[10px] text-zinc-550 uppercase tracking-widest block text-center mb-2">
+          <span className="text-xs text-zinc-550 uppercase tracking-widest block text-center mb-2">
             Rotaciones en Juego (Red al Centro)
           </span>
           <div className="grid grid-cols-2 gap-3 relative">
@@ -297,7 +297,7 @@ export default function PublicLiveMatch() {
           Volver
         </button>
 
-        <span className="text-[10px] text-zinc-500 font-black tracking-widest uppercase flex items-center gap-1.5">
+        <span className="text-xs text-zinc-500 font-black tracking-widest uppercase flex items-center gap-1.5">
           {matchData.status === 'in_progress' ? (
             <>
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
@@ -319,7 +319,7 @@ export default function PublicLiveMatch() {
       </div>
 
       {/* 2. MATCH INFO */}
-      <div className="bg-zinc-950/30 border-b border-zinc-900 px-4 py-1.5 text-center flex items-center justify-center gap-3 text-[10px] font-bold text-gray-400 z-10">
+      <div className="bg-zinc-950/30 border-b border-zinc-900 px-4 py-1.5 text-center flex items-center justify-center gap-3 text-xs font-bold text-gray-400 z-10">
         <span>Cancha {matchData.court}</span>
         <span>•</span>
         {prevSets.length > 0 && (
@@ -350,11 +350,11 @@ export default function PublicLiveMatch() {
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="px-3 py-2 bg-white/10 border border-white/20 text-[10px] font-semibold text-white rounded-xl">
+            <span className="px-3 py-2 bg-white/10 border border-white/20 text-xs font-semibold text-white rounded-xl">
               Tiempos Fuera: {timeouts1}/2
             </span>
             {servingTeam === 'team1' && (
-              <span className="px-3 py-2 bg-white border border-white text-orange-brand text-[10px] font-extrabold rounded-xl flex items-center gap-1">
+              <span className="px-3 py-2 bg-white border border-white text-orange-brand text-xs font-extrabold rounded-xl flex items-center gap-1">
                 🏐 Al Saque
               </span>
             )}
@@ -380,11 +380,11 @@ export default function PublicLiveMatch() {
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="px-3 py-2 bg-white/10 border border-white/20 text-[10px] font-semibold text-white rounded-xl">
+            <span className="px-3 py-2 bg-white/10 border border-white/20 text-xs font-semibold text-white rounded-xl">
               Tiempos Fuera: {timeouts2}/2
             </span>
             {servingTeam === 'team2' && (
-              <span className="px-3 py-2 bg-white border border-white text-purple-brand text-[10px] font-extrabold rounded-xl flex items-center gap-1">
+              <span className="px-3 py-2 bg-white border border-white text-purple-brand text-xs font-extrabold rounded-xl flex items-center gap-1">
                 🏐 Al Saque
               </span>
             )}
@@ -397,7 +397,7 @@ export default function PublicLiveMatch() {
 
       {/* 5. BOTTOM SPECTATOR TOOLBAR */}
       <div className="px-4 py-3 border-t border-zinc-900 bg-zinc-950/60 flex items-center justify-between gap-2 z-10">
-        <span className="text-[10px] text-zinc-500 font-bold flex items-center gap-1.5">
+        <span className="text-xs text-zinc-500 font-bold flex items-center gap-1.5">
           <Activity className="w-3.5 h-3.5 text-orange-brand animate-pulse" />
           Sincronizado en tiempo real
         </span>
@@ -436,7 +436,7 @@ export default function PublicLiveMatch() {
           <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-3xl text-center max-w-xs w-full relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-brand to-purple-brand animate-pulse" />
             <span className="text-3xl block mb-2">🏆</span>
-            <span className="text-[10px] font-black uppercase text-zinc-500 tracking-widest block mb-1">Set Concluido</span>
+            <span className="text-sm font-black uppercase text-zinc-500 tracking-widest block mb-1">Set Concluido</span>
             <h3 className={`text-xl font-black uppercase mb-1 ${
               pendingSetWinner === 'team1' ? 'text-orange-brand' : 'text-purple-brand'
             }`}>
@@ -445,7 +445,7 @@ export default function PublicLiveMatch() {
             <span className="text-3xl font-mono font-extrabold text-white block mb-4">
               {currentSet.team1} - {currentSet.team2}
             </span>
-            <p className="text-[10px] text-zinc-500 leading-relaxed">
+            <p className="text-xs text-zinc-500 leading-relaxed">
               Esperando a que el árbitro inicie el próximo set...
             </p>
           </div>
@@ -458,7 +458,7 @@ export default function PublicLiveMatch() {
           <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-3xl text-center max-w-xs w-full relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-brand to-purple-brand" />
             <span className="text-5xl block mb-3">🏐🏆</span>
-            <span className="text-[10px] font-black uppercase text-zinc-500 tracking-widest block mb-1">Partido Finalizado</span>
+            <span className="text-sm font-black uppercase text-zinc-500 tracking-widest block mb-1">Partido Finalizado</span>
             <h3 className={`text-xl font-black uppercase mb-6 ${
               winnerId === matchData.team1_id ? 'text-orange-brand' : 'text-purple-brand'
             }`}>
@@ -466,7 +466,7 @@ export default function PublicLiveMatch() {
             </h3>
             <button
               onClick={() => navigate(`/tournament/${matchData.tournament_id}`)}
-              className="w-full py-3 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-extrabold rounded-xl text-xs uppercase tracking-wider"
+              className="w-full py-3 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-extrabold rounded-xl text-sm uppercase tracking-wider"
             >
               Volver al Torneo
             </button>

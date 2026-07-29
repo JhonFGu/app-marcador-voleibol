@@ -169,19 +169,19 @@ export default function AdminDashboard() {
     switch (role) {
       case 'creator':
         return (
-          <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase font-mono">
+          <span className="px-2 py-0.5 text-xs font-bold rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase font-mono">
             Creador
           </span>
         );
       case 'admin':
         return (
-          <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-orange-brand/10 text-orange-brand border border-orange-brand/20 uppercase font-mono">
+          <span className="px-2 py-0.5 text-xs font-bold rounded bg-orange-brand/10 text-orange-brand border border-orange-brand/20 uppercase font-mono">
             Admin
           </span>
         );
       case 'referee':
         return (
-          <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase font-mono">
+          <span className="px-2 py-0.5 text-xs font-bold rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase font-mono">
             Árbitro
           </span>
         );
@@ -223,7 +223,7 @@ export default function AdminDashboard() {
             <Trophy className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="font-extrabold text-base tracking-tight">PuntosVolley Admin</h1>
+            <h1 className="font-extrabold text-xl tracking-tight">PuntosVolley Admin</h1>
             <span className="text-xs text-gray-500 font-mono">{user.email}</span>
           </div>
         </div>

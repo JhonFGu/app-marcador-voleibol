@@ -318,7 +318,7 @@ export default function RefScoreboard() {
 
       return (
         <div className={`bg-zinc-900/60 py-1.5 rounded-lg text-xs font-bold border relative flex flex-col items-center justify-center min-h-[42px] transition-all ${borderClass} ${textClass}`}>
-          <span className="block text-[7px] text-zinc-550 font-sans uppercase tracking-wider">{label}</span>
+          <span className="block text-2xs text-zinc-550 font-sans uppercase tracking-wider">{label}</span>
           <span className="text-sm font-black">{playerNum}</span>
           {isServer && showBall && (
             <span className={`absolute ${isLeft ? 'right-1.5' : 'left-1.5'} bottom-1 text-[9px] animate-pulse`}>🏐</span>
@@ -330,7 +330,7 @@ export default function RefScoreboard() {
     return (
       <div className="px-4 pb-4 w-full max-w-xl mx-auto z-0">
         <div className="bg-zinc-950/60 border border-zinc-900 rounded-2xl p-3">
-          <span className="text-[10px] text-zinc-500 uppercase tracking-widest block text-center mb-2">
+          <span className="text-xs text-zinc-500 uppercase tracking-widest block text-center mb-2">
             Posiciones de Rotación (Red al Centro)
           </span>
           <div className="grid grid-cols-2 gap-3 relative">
@@ -383,13 +383,13 @@ export default function RefScoreboard() {
             if (tournamentId) navigate(`/admin/tournament/${tournamentId}/play`);
             else navigate('/admin/dashboard');
           }}
-          className="p-2 bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800 transition-colors flex items-center gap-1 text-xs font-bold text-gray-300"
+          className="p-2 bg-zinc-900 border border-zinc-800 rounded-xl hover:bg-zinc-800 transition-colors flex items-center gap-1 text-sm font-bold text-gray-300"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Salir
         </button>
 
-        <span className="text-[10px] text-zinc-500 font-black tracking-widest uppercase">
+        <span className="text-xs text-zinc-500 font-black tracking-widest uppercase">
           Árbitro • Cancha {courtNumber}
         </span>
 
@@ -408,7 +408,7 @@ export default function RefScoreboard() {
       </div>
 
       {/* 2. MATCH INFORMATION BAR */}
-      <div className="bg-zinc-950/30 border-b border-zinc-900 px-4 py-1.5 text-center flex items-center justify-center gap-3 text-[10px] font-bold text-gray-400 z-10">
+      <div className="bg-zinc-950/30 border-b border-zinc-900 px-4 py-1.5 text-center flex items-center justify-center gap-3 text-xs font-bold text-gray-400 z-10">
         <span>Sets para ganar: {config.setsToWin}</span>
         <span>•</span>
         <span>Set normal a {config.regularPoints} pts</span>
@@ -466,7 +466,7 @@ export default function RefScoreboard() {
                   +
                 </button>
               </div>
-              <span className="text-[9px] uppercase font-bold text-white/70 mt-2 block pointer-events-none">
+              <span className="text-2xs uppercase font-bold text-white/70 mt-2 block pointer-events-none">
                 Toca la tarjeta para sumar
               </span>
             </div>
@@ -476,13 +476,13 @@ export default function RefScoreboard() {
               <button
                 onClick={() => handleTimeoutClick(leftTeamKey)}
                 disabled={leftTimeouts >= 2 || timeoutCountdown !== null}
-                className="px-3 py-2 bg-white/10 border border-white/20 disabled:opacity-30 font-bold text-[10px] text-white rounded-xl hover:bg-white/20 hover:border-white/40 transition-colors"
+                className="px-3 py-2 bg-white/10 border border-white/20 disabled:opacity-30 font-bold text-xs text-white rounded-xl hover:bg-white/20 hover:border-white/40 transition-colors"
               >
                 ⏱️ Tiempo Fuera ({leftTimeouts}/2)
               </button>
               <button
                 onClick={() => setServe(leftTeamKey)}
-                className={`px-3 py-2 border font-bold text-[10px] rounded-xl flex items-center gap-1.5 transition-colors ${
+                className={`px-3 py-2 border font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors ${
                   servingTeam === leftTeamKey
                     ? 'bg-white border-white text-orange-brand'
                     : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
@@ -534,7 +534,7 @@ export default function RefScoreboard() {
                   +
                 </button>
               </div>
-              <span className="text-[9px] uppercase font-bold text-white/70 mt-2 block pointer-events-none">
+              <span className="text-2xs uppercase font-bold text-white/70 mt-2 block pointer-events-none">
                 Toca la tarjeta para sumar
               </span>
             </div>
@@ -544,13 +544,13 @@ export default function RefScoreboard() {
               <button
                 onClick={() => handleTimeoutClick(rightTeamKey)}
                 disabled={rightTimeouts >= 2 || timeoutCountdown !== null}
-                className="px-3 py-2 bg-white/10 border border-white/20 disabled:opacity-30 font-bold text-[10px] text-white rounded-xl hover:bg-white/20 hover:border-white/40 transition-colors"
+                className="px-3 py-2 bg-white/10 border border-white/20 disabled:opacity-30 font-bold text-xs text-white rounded-xl hover:bg-white/20 hover:border-white/40 transition-colors"
               >
                 ⏱️ Tiempo Fuera ({rightTimeouts}/2)
               </button>
               <button
                 onClick={() => setServe(rightTeamKey)}
-                className={`px-3 py-2 border font-bold text-[10px] rounded-xl flex items-center gap-1.5 transition-colors ${
+                className={`px-3 py-2 border font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors ${
                   servingTeam === rightTeamKey
                     ? 'bg-white border-white text-purple-brand'
                     : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
@@ -574,7 +574,7 @@ export default function RefScoreboard() {
                   <span className="flex items-center justify-center w-4 h-4 bg-white text-orange-brand rounded-full text-[9px] font-black animate-bounce shadow">🏐</span>
                 )}
               </div>
-              <h2 className="text-sm font-black text-white uppercase truncate max-w-[90%] mb-2.5">{leftTeamName}</h2>
+              <h2 className="text-base font-black text-white uppercase truncate max-w-[90%] mb-2.5">{leftTeamName}</h2>
               <div
                 onClick={() => handleScoreTap(leftTeamKey)}
                 className="w-full h-44 xs:h-52 flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
@@ -606,13 +606,13 @@ export default function RefScoreboard() {
                   <button
                     onClick={() => handleTimeoutClick(leftTeamKey)}
                     disabled={leftTimeouts >= 2 || timeoutCountdown !== null}
-                    className="flex-1 py-1.5 bg-white/10 border border-white/20 text-[10px] font-bold text-white rounded-lg hover:bg-white/20 disabled:opacity-30"
+                    className="flex-1 py-1.5 bg-white/10 border border-white/20 text-xs font-bold text-white rounded-lg hover:bg-white/20 disabled:opacity-30"
                   >
                     ⏱️ Tiempo ({leftTimeouts}/2)
                   </button>
                   <button
                     onClick={() => setServe(leftTeamKey)}
-                    className={`flex-1 py-1.5 border text-[10px] font-bold rounded-lg ${
+                    className={`flex-1 py-1.5 border text-xs font-bold rounded-lg ${
                       servingTeam === leftTeamKey
                         ? 'bg-white border-white text-orange-brand'
                         : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
@@ -633,7 +633,7 @@ export default function RefScoreboard() {
                   <span className="flex items-center justify-center w-4 h-4 bg-white text-purple-brand rounded-full text-[9px] font-black animate-bounce shadow">🏐</span>
                 )}
               </div>
-              <h2 className="text-sm font-black text-white uppercase truncate max-w-[90%] mb-2.5">{rightTeamName}</h2>
+              <h2 className="text-base font-black text-white uppercase truncate max-w-[90%] mb-2.5">{rightTeamName}</h2>
               <div
                 onClick={() => handleScoreTap(rightTeamKey)}
                 className="w-full h-44 xs:h-52 flex items-center justify-center bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:border-white/50 transition-all select-none active:scale-[0.96]"
@@ -665,13 +665,13 @@ export default function RefScoreboard() {
                   <button
                     onClick={() => handleTimeoutClick(rightTeamKey)}
                     disabled={rightTimeouts >= 2 || timeoutCountdown !== null}
-                    className="flex-1 py-1.5 bg-white/10 border border-white/20 text-[10px] font-bold text-white rounded-lg hover:bg-white/20 disabled:opacity-30"
+                    className="flex-1 py-1.5 bg-white/10 border border-white/20 text-xs font-bold text-white rounded-lg hover:bg-white/20 disabled:opacity-30"
                   >
                     ⏱️ Tiempo ({rightTimeouts}/2)
                   </button>
                   <button
                     onClick={() => setServe(rightTeamKey)}
-                    className={`flex-1 py-1.5 border text-[10px] font-bold rounded-lg ${
+                    className={`flex-1 py-1.5 border text-xs font-bold rounded-lg ${
                       servingTeam === rightTeamKey
                         ? 'bg-white border-white text-purple-brand'
                         : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
@@ -738,7 +738,7 @@ export default function RefScoreboard() {
             onClick={() => {
               if (confirm('¿Restar un punto al equipo Local?')) subPoint('team1');
             }}
-            className="px-2.5 py-2.5 bg-zinc-900 border border-zinc-850 text-[10px] font-bold text-orange-brand hover:bg-zinc-800 rounded-xl"
+            className="px-2.5 py-2.5 bg-zinc-900 border border-zinc-850 text-xs font-bold text-orange-brand hover:bg-zinc-800 rounded-xl"
           >
             -1 Local
           </button>
@@ -747,7 +747,7 @@ export default function RefScoreboard() {
             onClick={() => {
               if (confirm('¿Restar un punto al equipo Visitante?')) subPoint('team2');
             }}
-            className="px-2.5 py-2.5 bg-zinc-900 border border-zinc-850 text-[10px] font-bold text-purple-brand hover:bg-zinc-800 rounded-xl"
+            className="px-2.5 py-2.5 bg-zinc-900 border border-zinc-850 text-xs font-bold text-purple-brand hover:bg-zinc-800 rounded-xl"
           >
             -1 Vis.
           </button>
@@ -767,7 +767,7 @@ export default function RefScoreboard() {
         <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-6 backdrop-blur-sm">
           <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-3xl text-center max-w-xs w-full relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-brand to-purple-brand animate-pulse" />
-            <span className="text-xs uppercase font-extrabold tracking-widest text-zinc-500 block mb-1">
+            <span className="text-sm uppercase font-extrabold tracking-widest text-zinc-500 block mb-1">
               Tiempo Fuera solicitado por:
             </span>
             <span className={`text-lg font-black uppercase tracking-tight block mb-6 ${
@@ -783,7 +783,7 @@ export default function RefScoreboard() {
                 setTimeoutCountdown(null);
                 setTimeoutTeam(null);
               }}
-              className="py-2.5 px-6 bg-zinc-900 border border-zinc-850 hover:bg-zinc-800 text-zinc-200 text-xs font-bold rounded-xl"
+              className="py-2.5 px-6 bg-zinc-900 border border-zinc-850 hover:bg-zinc-800 text-zinc-200 text-sm font-bold rounded-xl"
             >
               Saltar Cuenta Regresiva
             </button>
@@ -797,7 +797,7 @@ export default function RefScoreboard() {
           <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-3xl text-center max-w-xs w-full relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-brand to-purple-brand animate-pulse" />
             <span className="text-3xl block mb-2">🏆</span>
-            <span className="text-[10px] font-black uppercase text-zinc-500 tracking-widest block mb-1">Set Concluido</span>
+            <span className="text-sm font-black uppercase text-zinc-500 tracking-widest block mb-1">Set Concluido</span>
             <h3 className={`text-xl font-black uppercase mb-1 ${
               pendingSetWinner === 'team1' ? 'text-orange-brand' : 'text-purple-brand'
             }`}>
@@ -806,20 +806,20 @@ export default function RefScoreboard() {
             <span className="text-3xl font-mono font-extrabold text-white block mb-6">
               {score1} - {score2}
             </span>
-            <p className="text-[10px] text-zinc-500 leading-relaxed mb-6">
+            <p className="text-xs text-zinc-500 leading-relaxed mb-6">
               Por favor, realicen el cambio de lado físico de la cancha. Puedes reflejar este cambio en la pantalla usando el botón a continuación.
             </p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={swapSides}
-                className="py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-bold text-zinc-300 flex items-center justify-center gap-1.5 hover:bg-zinc-850"
+                className="py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm font-bold text-zinc-300 flex items-center justify-center gap-1.5 hover:bg-zinc-850"
               >
                 <ArrowLeftRight className="w-3.5 h-3.5 text-zinc-400" />
                 Intercambiar Marcadores en Pantalla
               </button>
               <button
                 onClick={confirmSetWinner}
-                className="py-3 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-extrabold rounded-xl text-xs uppercase tracking-wider mt-2"
+                className="py-3 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-extrabold rounded-xl text-sm uppercase tracking-wider mt-2"
               >
                 Comenzar Siguiente Set
               </button>
@@ -834,7 +834,7 @@ export default function RefScoreboard() {
           <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-3xl text-center max-w-xs w-full relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-brand to-purple-brand" />
             <span className="text-5xl block mb-3">🏐🏆</span>
-            <span className="text-[10px] font-black uppercase text-zinc-500 tracking-widest block mb-1">Partido Finalizado</span>
+            <span className="text-sm font-black uppercase text-zinc-500 tracking-widest block mb-1">Partido Finalizado</span>
             <h3 className={`text-xl font-black uppercase mb-6 ${
               matchWinnerId === team1.id ? 'text-orange-brand' : 'text-purple-brand'
             }`}>
@@ -846,7 +846,7 @@ export default function RefScoreboard() {
                   if (tournamentId) navigate(`/admin/tournament/${tournamentId}/play`);
                   else navigate('/admin/dashboard');
                 }}
-                className="py-3 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-extrabold rounded-xl text-xs uppercase tracking-wider"
+                className="py-3 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-extrabold rounded-xl text-sm uppercase tracking-wider"
               >
                 Volver al Torneo
               </button>
@@ -860,13 +860,13 @@ export default function RefScoreboard() {
         <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-6 backdrop-blur-sm">
           <div className="bg-zinc-950 border border-zinc-900 p-6 rounded-3xl text-center max-w-xs w-full">
             <h4 className="text-sm font-bold text-white mb-2">¿Confirmas reiniciar el partido?</h4>
-            <p className="text-[10px] text-zinc-500 leading-relaxed mb-6">
+            <p className="text-xs text-zinc-500 leading-relaxed mb-6">
               Esta acción borrará todos los puntos y sets disputados del partido actual y comenzará de 0:0.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowConfirmReset(false)}
-                className="flex-1 py-2 bg-zinc-900 border border-zinc-850 rounded-xl text-xs font-bold text-gray-400"
+                className="flex-1 py-2 bg-zinc-900 border border-zinc-850 rounded-xl text-sm font-bold text-gray-400"
               >
                 Cancelar
               </button>
@@ -875,7 +875,7 @@ export default function RefScoreboard() {
                   resetMatch();
                   setShowConfirmReset(false);
                 }}
-                className="flex-1 py-2 bg-red-650 text-white font-bold rounded-xl text-xs"
+                className="flex-1 py-2 bg-red-650 text-white font-bold rounded-xl text-sm"
               >
                 Reiniciar
               </button>

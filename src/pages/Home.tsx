@@ -1,14 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Play, ShieldAlert } from 'lucide-react';
+import { useInstallPrompt } from '../hooks/useInstallPrompt';
+import InstallPrompt from '../components/InstallPrompt';
 
 export default function Home() {
   const navigate = useNavigate();
+  const { isInstallable, promptInstall, dismiss } = useInstallPrompt();
 
   return (
     <div className="flex flex-col items-center justify-between min-h-[85vh] p-4 text-white select-none">
       {/* Header / Brand */}
       <div className="flex flex-col items-center mt-6 text-center">
-        <h1 className="text-[32px] xs:text-[36px] font-black tracking-tight leading-none bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
+        <h1 className="text-3xl xs:text-4xl font-black tracking-tight leading-none bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
           PuntosVolley
         </h1>
         <p className="text-sm font-semibold tracking-wider text-gray-450 uppercase mt-1 mb-4 flex items-center gap-1 justify-center">
@@ -73,6 +76,12 @@ export default function Home() {
           v1.0.0 • © 2026 Cuervos Volley Club. Todos los derechos reservados.
         </p>
       </div>
+
+      <InstallPrompt
+        isInstallable={isInstallable}
+        onInstall={promptInstall}
+        onDismiss={dismiss}
+      />
     </div>
   );
 }

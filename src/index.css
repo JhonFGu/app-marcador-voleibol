@@ -5,22 +5,29 @@
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-digital: 'Orbitron', monospace;
-  
+
   --color-orange-brand: #F97316;
   --color-purple-brand: #A855F7;
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 0.875rem;
 }
 
-/* Custom base styles */
-body {
-  background-color: #000000;
-  color: #ffffff;
-  font-family: var(--font-sans);
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: var(--font-sans);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }
 
-/* Custom digital segment display effects */
 .digital-glow-orange {
   text-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
 }
@@ -33,7 +40,6 @@ body {
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
 }
 
-/* Prevent text selection during rapid scoring taps */
 .select-none {
   user-select: none;
   -webkit-user-select: none;

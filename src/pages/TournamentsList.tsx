@@ -65,7 +65,7 @@ export default function TournamentsList() {
           <ArrowLeft className="w-5 h-5 text-gray-300" />
         </button>
         <div>
-          <h2 className="text-[22px] font-extrabold tracking-tight">Torneos Activos</h2>
+          <h2 className="text-xl font-extrabold tracking-tight">Torneos Activos</h2>
           <p className="text-sm text-gray-400">PuntosVolley online</p>
         </div>
       </div>

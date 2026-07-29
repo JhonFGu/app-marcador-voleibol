@@ -195,7 +195,7 @@ export default function MatchScoreboard() {
 
       return (
         <div className={`bg-zinc-900/60 py-1.5 rounded-lg text-xs font-bold border relative flex flex-col items-center justify-center min-h-[42px] transition-all ${borderClass} ${textClass}`}>
-          <span className="block text-[7px] text-zinc-550 font-sans uppercase tracking-wider">{label}</span>
+          <span className="block text-2xs text-zinc-550 font-sans uppercase tracking-wider">{label}</span>
           <span className="text-sm font-black">{playerNum}</span>
           {isServer && showBall && (
             <span className={`absolute ${isLeft ? 'right-1.5' : 'left-1.5'} bottom-1 text-[9px] animate-pulse`}>🏐</span>
@@ -207,7 +207,7 @@ export default function MatchScoreboard() {
     return (
       <div className="px-4 pb-4 w-full max-w-xl mx-auto z-0">
         <div className="bg-zinc-950/60 border border-zinc-900 rounded-2xl p-3">
-          <span className="text-[10px] text-zinc-550 uppercase tracking-widest block text-center mb-2">
+          <span className="text-xs text-zinc-550 uppercase tracking-widest block text-center mb-2">
             Posiciones de Rotación (Red al Centro)
           </span>
           <div className="grid grid-cols-2 gap-3 relative">
@@ -347,7 +347,7 @@ export default function MatchScoreboard() {
             <button
               onClick={() => handleTimeoutClick(leftTeamKey)}
               disabled={leftTimeouts >= 2}
-              className="mt-2 text-[10px] font-bold text-white/80 hover:text-white disabled:opacity-30"
+              className="mt-2 text-xs font-bold text-white/80 hover:text-white disabled:opacity-30"
             >
               Pedir Tiempo ({leftTimeouts}/2)
             </button>
@@ -425,7 +425,7 @@ export default function MatchScoreboard() {
             <button
               onClick={() => handleTimeoutClick(rightTeamKey)}
               disabled={rightTimeouts >= 2}
-              className="mt-2 text-[10px] font-bold text-white/80 hover:text-white disabled:opacity-30"
+              className="mt-2 text-xs font-bold text-white/80 hover:text-white disabled:opacity-30"
             >
               Pedir Tiempo ({rightTimeouts}/2)
             </button>
@@ -446,7 +446,7 @@ export default function MatchScoreboard() {
                     🏐
                   </span>
                 )}
-                <h2 className="text-sm font-black tracking-wide text-white truncate uppercase max-w-[80%]">{leftTeamName}</h2>
+                <h2 className="text-base font-black tracking-wide text-white truncate uppercase max-w-[80%]">{leftTeamName}</h2>
               </div>
 
               {/* Tappable score card */}
@@ -499,7 +499,7 @@ export default function MatchScoreboard() {
                     🏐
                   </span>
                 )}
-                <h2 className="text-sm font-black tracking-wide text-white truncate uppercase max-w-[80%]">{rightTeamName}</h2>
+                <h2 className="text-base font-black tracking-wide text-white truncate uppercase max-w-[80%]">{rightTeamName}</h2>
               </div>
 
               {/* Tappable score card */}
@@ -601,7 +601,7 @@ export default function MatchScoreboard() {
       <div className="mt-auto p-4 border-t border-zinc-900 bg-zinc-950 flex items-center justify-around">
         <button
           onClick={() => setShowConfirmReset(true)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-semibold text-red-500 hover:bg-zinc-800"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-sm font-semibold text-red-500 hover:bg-zinc-800"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reiniciar
@@ -609,7 +609,7 @@ export default function MatchScoreboard() {
 
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-semibold text-gray-400 hover:text-white"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-sm font-semibold text-gray-400 hover:text-white"
         >
           Salir
         </button>
@@ -654,7 +654,7 @@ export default function MatchScoreboard() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowConfirmReset(false)}
-                className="flex-1 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-semibold text-gray-400"
+                className="flex-1 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm font-semibold text-gray-400"
               >
                 Cancelar
               </button>
@@ -664,7 +664,7 @@ export default function MatchScoreboard() {
                   resetMatch();
                   setShowConfirmReset(false);
                 }}
-                className="flex-1 py-2.5 rounded-xl bg-red-650 text-white font-bold text-xs"
+                className="flex-1 py-2.5 rounded-xl bg-red-650 text-white font-bold text-sm"
               >
                 Reiniciar
               </button>
@@ -682,7 +682,7 @@ export default function MatchScoreboard() {
               🎉
             </div>
           </div>
-          <span className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">¡SET FINALIZADO!</span>
+          <span className="text-sm text-zinc-500 uppercase tracking-widest mb-1">¡SET FINALIZADO!</span>
           <h2 className="text-2xl font-extrabold text-white mb-2">
             {pendingSetWinner === 'team1' ? team1.name : team2.name} gana el Set
           </h2>
@@ -723,13 +723,13 @@ export default function MatchScoreboard() {
               <span className="text-5xl">🏆</span>
             </div>
           </div>
-          <span className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">¡PARTIDO FINALIZADO!</span>
+          <span className="text-sm text-zinc-500 uppercase tracking-widest mb-1">¡PARTIDO FINALIZADO!</span>
           <h2 className="text-3xl font-extrabold text-white mb-6">
             {matchWinnerId === team1.id ? team1.name : team2.name} gana el encuentro
           </h2>
 
           <div className="bg-zinc-900 border border-zinc-800/60 p-4 rounded-2xl max-w-xs w-full mb-8 text-center font-mono">
-            <span className="text-xs text-gray-500 block mb-2 font-sans uppercase tracking-wider">Marcador Final</span>
+            <span className="text-sm text-gray-500 block mb-2 font-sans uppercase tracking-wider">Marcador Final</span>
             <div className="flex justify-center items-center gap-3 text-lg font-bold text-white mb-2">
               <span>{sets1}</span>
               <span className="text-zinc-600">:</span>

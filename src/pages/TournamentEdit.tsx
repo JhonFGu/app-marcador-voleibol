@@ -733,8 +733,8 @@ export default function TournamentEdit() {
             <ArrowLeft className="w-4 h-4 text-gray-300" />
           </button>
           <div>
-            <h1 className="font-extrabold text-sm truncate max-w-[150px]">{tournamentName}</h1>
-            <span className="text-[10px] text-orange-brand font-bold uppercase tracking-wider">Fase de Edición</span>
+            <h1 className="font-extrabold text-xl truncate max-w-[150px]">{tournamentName}</h1>
+            <span className="text-xs text-orange-brand font-bold uppercase tracking-wider">Fase de Edición</span>
           </div>
         </div>
 
@@ -742,7 +742,7 @@ export default function TournamentEdit() {
         <button
           onClick={handleActivateTournament}
           disabled={isActivating || matches.length === 0}
-          className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-bold rounded-xl text-[10px] disabled:opacity-40"
+          className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-bold rounded-xl text-sm disabled:opacity-40"
         >
           {isActivating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 fill-current" />}
           Iniciar Torneo
@@ -753,7 +753,7 @@ export default function TournamentEdit() {
       <div className={`grid ${userRole === 'creator' ? 'grid-cols-4' : 'grid-cols-3'} p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-sm mx-auto w-full`}>
         <button
           onClick={() => setActiveTab('rules')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'rules' ? 'bg-zinc-800 text-orange-brand' : 'text-gray-400'
           }`}
         >
@@ -762,7 +762,7 @@ export default function TournamentEdit() {
         </button>
         <button
           onClick={() => setActiveTab('teams')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'teams' ? 'bg-zinc-800 text-purple-brand' : 'text-gray-400'
           }`}
         >
@@ -771,7 +771,7 @@ export default function TournamentEdit() {
         </button>
         <button
           onClick={() => setActiveTab('fixture')}
-          className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
             activeTab === 'fixture' ? 'bg-zinc-800 text-zinc-200' : 'text-gray-400'
           }`}
         >
@@ -781,7 +781,7 @@ export default function TournamentEdit() {
         {userRole === 'creator' && (
           <button
             onClick={() => setActiveTab('staff')}
-            className={`py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+            className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 'staff' ? 'bg-zinc-800 text-amber-450' : 'text-gray-400'
             }`}
           >
@@ -798,15 +798,15 @@ export default function TournamentEdit() {
         {activeTab === 'rules' && (
           <div className="flex flex-col gap-5">
             <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-2xl flex flex-col gap-4">
-              <h3 className="text-sm font-extrabold text-zinc-300">Configuración Deportiva</h3>
+              <h3 className="text-base font-extrabold text-zinc-300">Configuración Deportiva</h3>
 
               {/* Courts count */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-gray-400">Cantidad de canchas</label>
+                <label className="text-sm text-gray-400">Cantidad de canchas</label>
                 <select
                   value={courts}
                   onChange={(e) => setCourts(Number(e.target.value))}
-                  className="px-3 py-2.5 bg-zinc-900 border border-zinc-850 rounded-xl text-xs focus:outline-none focus:border-orange-brand"
+                  className="px-3 py-2.5 bg-zinc-900 border border-zinc-850 rounded-xl text-sm focus:outline-none focus:border-orange-brand"
                 >
                   {[1, 2, 3, 4, 5, 6].map(n => (
                     <option key={n} value={n}>{n} Cancha{n > 1 ? 's' : ''}</option>
@@ -816,12 +816,12 @@ export default function TournamentEdit() {
 
               {/* Sets to win */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-gray-400">Sets para ganar</label>
+                <label className="text-sm text-gray-400">Sets para ganar</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setSetsToWin(2)}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
                       setsToWin === 2
                         ? 'bg-zinc-900 border-orange-brand text-orange-brand'
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -832,7 +832,7 @@ export default function TournamentEdit() {
                   <button
                     type="button"
                     onClick={() => setSetsToWin(3)}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
                       setsToWin === 3
                         ? 'bg-zinc-900 border-orange-brand text-orange-brand'
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -846,11 +846,11 @@ export default function TournamentEdit() {
               {/* Points */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-gray-400">Puntos set regular</label>
+                  <label className="text-sm text-gray-400">Puntos set regular</label>
                   <select
                     value={regularPoints}
                     onChange={(e) => setRegularPoints(Number(e.target.value))}
-                    className="px-3 py-2.5 bg-zinc-900 border border-zinc-850 rounded-xl text-xs focus:outline-none focus:border-orange-brand"
+                    className="px-3 py-2.5 bg-zinc-900 border border-zinc-850 rounded-xl text-sm focus:outline-none focus:border-orange-brand"
                   >
                     <option value={25}>25 puntos</option>
                     <option value={21}>21 puntos</option>
@@ -862,11 +862,11 @@ export default function TournamentEdit() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-gray-400">Puntos set desempate</label>
+                  <label className="text-sm text-gray-400">Puntos set desempate</label>
                   <select
                     value={tiebreakPoints}
                     onChange={(e) => setTiebreakPoints(Number(e.target.value))}
-                    className="px-3 py-2.5 bg-zinc-900 border border-zinc-850 rounded-xl text-xs focus:outline-none focus:border-purple-brand"
+                    className="px-3 py-2.5 bg-zinc-900 border border-zinc-850 rounded-xl text-sm focus:outline-none focus:border-purple-brand"
                   >
                     <option value={3}>3 puntos</option>
                     <option value={5}>5 puntos</option>
@@ -878,12 +878,12 @@ export default function TournamentEdit() {
 
               {/* Overtime Type */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-gray-400">Condición de Fin de Set</label>
+                <label className="text-sm text-gray-400">Condición de Fin de Set</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setOvertimeMode('con_alargue')}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
                       overtimeMode === 'con_alargue'
                         ? 'bg-zinc-900 border-orange-brand text-orange-brand'
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -894,7 +894,7 @@ export default function TournamentEdit() {
                   <button
                     type="button"
                     onClick={() => setOvertimeMode('a_muerte')}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
                       overtimeMode === 'a_muerte'
                         ? 'bg-zinc-900 border-orange-brand text-orange-brand'
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -907,14 +907,14 @@ export default function TournamentEdit() {
 
               {/* Modality */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-gray-400">Modalidad</label>
+                <label className="text-sm text-gray-400">Modalidad</label>
                 <div className="grid grid-cols-5 gap-1">
                   {(['2v2', '3v3', '4v4', '5v5', '6v6'] as MatchModality[]).map((mode) => (
                     <button
                       key={mode}
                       type="button"
                       onClick={() => setModality(mode)}
-                      className={`py-1.5 text-[10px] font-extrabold rounded-lg border transition-all ${
+                      className={`py-1.5 text-xs font-extrabold rounded-lg border transition-all ${
                         modality === mode
                           ? 'bg-zinc-900 border-purple-brand text-purple-brand'
                           : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -930,7 +930,7 @@ export default function TournamentEdit() {
             <button
               onClick={handleSaveRules}
               disabled={isSavingRules}
-              className="flex items-center justify-center gap-1.5 w-full py-3.5 bg-zinc-900 border border-zinc-800 hover:text-white text-gray-300 font-bold rounded-2xl text-xs"
+              className="flex items-center justify-center gap-1.5 w-full py-3.5 bg-zinc-900 border border-zinc-800 hover:text-white text-gray-300 font-bold rounded-2xl text-sm"
             >
               {isSavingRules ? <Loader2 className="w-4 h-4 animate-spin text-orange-brand" /> : <Save className="w-4 h-4" />}
               Guardar Ajustes
@@ -950,12 +950,12 @@ export default function TournamentEdit() {
                 onChange={(e) => setNewTeamName(e.target.value)}
                 placeholder="Nombre del nuevo equipo"
                 required
-                className="flex-grow px-3 py-2.5 bg-zinc-950 border border-zinc-900 rounded-xl text-xs text-white focus:outline-none focus:border-purple-brand"
+                className="flex-grow px-3 py-2.5 bg-zinc-950 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-brand"
               />
               <button
                 type="submit"
                 disabled={isAddingTeam || !newTeamName.trim()}
-                className="px-4 py-2.5 bg-purple-brand text-white font-bold rounded-xl text-xs flex items-center justify-center disabled:opacity-40"
+                className="px-4 py-2.5 bg-purple-brand text-white font-bold rounded-xl text-sm flex items-center justify-center disabled:opacity-40"
               >
                 {isAddingTeam ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               </button>
@@ -965,7 +965,7 @@ export default function TournamentEdit() {
               type="button"
               onClick={handleLoadMockData}
               disabled={isAddingTeam}
-              className="w-full py-2 bg-zinc-900 border border-zinc-800 text-[10px] uppercase font-bold text-purple-brand hover:bg-zinc-850 rounded-xl"
+              className="w-full py-2 bg-zinc-900 border border-zinc-800 text-xs uppercase font-bold text-purple-brand hover:bg-zinc-850 rounded-xl"
             >
               Cargar Equipos Demo / Mock
             </button>
@@ -1008,11 +1008,11 @@ export default function TournamentEdit() {
                     {/* PLAYERS SUB-MENU FOR SELECTED TEAM */}
                     {selectedTeam?.id === team.id && (
                       <div className="p-4 bg-zinc-950/70 border-t border-zinc-900/20 flex flex-col gap-3">
-                        <span className="text-[10px] font-bold text-purple-brand uppercase tracking-wider">Jugadores</span>
+                        <span className="text-xs font-bold text-purple-brand uppercase tracking-wider">Jugadores</span>
                         
                         {/* Players list */}
                         {players.length === 0 ? (
-                          <p className="text-[10px] text-zinc-500 text-center py-1">Sin jugadores asignados</p>
+                          <p className="text-2xs text-zinc-500 text-center py-1">Sin jugadores asignados</p>
                         ) : (
                           <div className="flex flex-col gap-1.5">
                             {players.map(p => (
@@ -1039,14 +1039,14 @@ export default function TournamentEdit() {
                             onChange={(e) => setNewPlayerName(e.target.value)}
                             placeholder="Nombre jugador"
                             required
-                            className="flex-grow px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white focus:outline-none"
+                            className="flex-grow px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-white focus:outline-none"
                           />
                           <input
                             type="number"
                             value={newPlayerNumber}
                             onChange={(e) => setNewPlayerNumber(e.target.value)}
                             placeholder="#"
-                            className="w-12 px-1.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-white text-center focus:outline-none"
+                            className="w-12 px-1.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-white text-center focus:outline-none"
                           />
                           <button
                             type="submit"
@@ -1069,16 +1069,16 @@ export default function TournamentEdit() {
         {activeTab === 'fixture' && (
           <div className="flex flex-col gap-5">
             <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-2xl flex flex-col gap-4">
-              <h3 className="text-sm font-extrabold text-zinc-300">Programación de Partidos</h3>
+              <h3 className="text-base font-extrabold text-zinc-300">Programación de Partidos</h3>
 
               {/* Tournament Format */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-gray-400">Formato del Torneo</label>
+                <label className="text-sm text-gray-400">Formato del Torneo</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setFormat('league')}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
                       format === 'league'
                         ? 'bg-zinc-900 border-zinc-300 text-zinc-200'
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -1089,7 +1089,7 @@ export default function TournamentEdit() {
                   <button
                     type="button"
                     onClick={() => setFormat('groups')}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
                       format === 'groups'
                         ? 'bg-zinc-900 border-zinc-300 text-zinc-200'
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -1103,11 +1103,11 @@ export default function TournamentEdit() {
               {/* Group selection */}
               {format === 'groups' && (
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-gray-400">Cantidad de Grupos</label>
+                  <label className="text-sm text-gray-400">Cantidad de Grupos</label>
                   <select
                     value={groupCount}
                     onChange={(e) => setGroupCount(Number(e.target.value))}
-                    className="px-3 py-2.5 bg-zinc-900 border border-zinc-850 rounded-xl text-xs focus:outline-none focus:border-zinc-500"
+                    className="px-3 py-2.5 bg-zinc-900 border border-zinc-850 rounded-xl text-sm focus:outline-none focus:border-zinc-500"
                   >
                     <option value={2}>2 Grupos</option>
                     <option value={3}>3 Grupos</option>
@@ -1120,12 +1120,12 @@ export default function TournamentEdit() {
 
               {/* Scheduling Details */}
               <div className="flex flex-col gap-1.5 border-t border-zinc-900 pt-3">
-                <label className="text-xs text-gray-400">Fecha y Hora de Inicio del Torneo</label>
+                <label className="text-sm text-gray-400">Fecha y Hora de Inicio del Torneo</label>
                 <input
                   type="datetime-local"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="px-3 py-2 bg-zinc-900 border border-zinc-850 rounded-xl text-xs text-white focus:outline-none focus:border-orange-brand"
+                  className="px-3 py-2 bg-zinc-900 border border-zinc-850 rounded-xl text-sm text-white focus:outline-none focus:border-orange-brand"
                 />
                 {(() => {
                   const getMatchDuration = (pts: number): number => {
@@ -1136,7 +1136,7 @@ export default function TournamentEdit() {
                     return 35;
                   };
                   return (
-                    <span className="text-[10px] text-zinc-500 leading-relaxed">
+                    <span className="text-2xs text-zinc-500 leading-relaxed">
                       ⏱️ <strong>Tiempo estimado:</strong> {getMatchDuration(regularPoints)} min por partido (Sets a {regularPoints} pts). Los partidos simultáneos compartirán horario.
                     </span>
                   );
@@ -1148,12 +1148,12 @@ export default function TournamentEdit() {
             {/* Group Assignment Mode Selector */}
             {format === 'groups' && teams.length >= 2 && (
               <div className="flex flex-col gap-1.5 p-4 bg-zinc-950 border border-zinc-900 rounded-2xl">
-                <label className="text-xs text-gray-400">Distribución de Grupos</label>
+                <label className="text-sm text-gray-400">Distribución de Grupos</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setGroupAssignmentMode('automatic')}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
                       groupAssignmentMode === 'automatic'
                         ? 'bg-zinc-900 border-zinc-300 text-zinc-200'
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -1164,7 +1164,7 @@ export default function TournamentEdit() {
                   <button
                     type="button"
                     onClick={() => setGroupAssignmentMode('manual')}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
                       groupAssignmentMode === 'manual'
                         ? 'bg-zinc-900 border-zinc-300 text-zinc-200'
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
@@ -1180,14 +1180,14 @@ export default function TournamentEdit() {
             {format === 'groups' && teams.length >= 2 && groupAssignmentMode === 'automatic' && (
               <div className="flex flex-col gap-3 p-4 bg-zinc-950 border border-zinc-900 rounded-2xl relative overflow-hidden">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-purple-brand">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-purple-brand">
                     Distribución de Grupos
                   </h4>
                   <button
                     type="button"
                     onClick={handleShuffleGroups}
                     disabled={isShuffling || teams.length < 2}
-                    className="px-2.5 py-1 bg-zinc-900 border border-zinc-800 hover:border-purple-brand text-[9px] font-extrabold text-zinc-300 rounded-lg flex items-center gap-1 transition-all active:scale-95"
+                    className="px-2.5 py-1 bg-zinc-900 border border-zinc-800 hover:border-purple-brand text-xs font-extrabold text-zinc-300 rounded-lg flex items-center gap-1 transition-all active:scale-95"
                   >
                     {isShuffling ? (
                       <>
@@ -1216,15 +1216,15 @@ export default function TournamentEdit() {
 
                     return Object.entries(groupList).map(([letter, groupTeams]) => (
                       <div key={letter} className="p-3 bg-zinc-900/60 border border-zinc-850 rounded-xl flex flex-col gap-1.5">
-                        <span className="text-[10px] font-black text-zinc-300 uppercase border-b border-zinc-800 pb-1">
+                        <span className="text-xs font-black text-zinc-300 uppercase border-b border-zinc-800 pb-1">
                           Grupo {letter}
                         </span>
                         {groupTeams.length === 0 ? (
-                          <span className="text-[9px] text-zinc-650 italic">Sin equipos</span>
+                          <span className="text-2xs text-zinc-650 italic">Sin equipos</span>
                         ) : (
                           <div className="flex flex-col gap-0.5">
                             {groupTeams.map((team, idx) => (
-                              <span key={team.id} className="text-[11px] font-medium text-zinc-450 truncate">
+                              <span key={team.id} className="text-xs font-medium text-zinc-450 truncate">
                                 {idx + 1}. {team.name}
                               </span>
                             ))}
@@ -1241,10 +1241,10 @@ export default function TournamentEdit() {
             {format === 'groups' && teams.length >= 2 && groupAssignmentMode === 'manual' && (
               <div className="flex flex-col gap-4 p-4 bg-zinc-950 border border-zinc-900 rounded-2xl">
                 <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-purple-brand">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-purple-brand">
                     Asignación de Equipos a Grupos
                   </h4>
-                  <p className="text-[10px] text-zinc-500 mt-1">
+                  <p className="text-xs text-zinc-500 mt-1">
                     Selecciona a qué grupo pertenece cada equipo registrado.
                   </p>
                 </div>
@@ -1285,10 +1285,10 @@ export default function TournamentEdit() {
                 {/* Courts Assignment for Groups */}
                 <div className="border-t border-zinc-900 pt-3 flex flex-col gap-3">
                   <div>
-                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-orange-brand">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-orange-brand">
                       Asignación de Grupos a Canchas
                     </h4>
-                    <p className="text-[10px] text-zinc-500 mt-1">
+                    <p className="text-xs text-zinc-500 mt-1">
                       Define la cancha fija para cada grupo.
                     </p>
                   </div>
@@ -1301,7 +1301,7 @@ export default function TournamentEdit() {
                         : (idx % courts) + 1;
                       return (
                         <div key={letter} className="flex flex-col gap-1.5 p-2.5 bg-zinc-900/60 border border-zinc-850 rounded-xl">
-                          <span className="text-[11px] font-black text-zinc-350 uppercase">Grupo {letter}</span>
+                          <span className="text-xs font-black text-zinc-350 uppercase">Grupo {letter}</span>
                           <select
                             value={currentCourt}
                             onChange={(e) => {
@@ -1311,7 +1311,7 @@ export default function TournamentEdit() {
                                 [letter]: newCourt
                               }));
                             }}
-                            className="px-2 py-1.5 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-350 focus:outline-none focus:border-orange-brand"
+                            className="px-2 py-1.5 bg-zinc-950 border border-zinc-800 rounded-lg text-sm text-zinc-350 focus:outline-none focus:border-orange-brand"
                           >
                             {Array.from({ length: courts }).map((_, cIdx) => {
                               const courtNum = cIdx + 1;
@@ -1335,7 +1335,7 @@ export default function TournamentEdit() {
               type="button"
               onClick={handleGenerateFixture}
               disabled={isGeneratingFixture || teams.length < 2}
-              className="w-full py-3.5 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-extrabold rounded-xl text-xs flex items-center justify-center gap-1.5 disabled:opacity-40 transition-all active:scale-[0.99] shadow-lg shadow-purple-brand/10"
+              className="w-full py-3.5 bg-gradient-to-r from-orange-brand to-purple-brand text-white font-extrabold rounded-xl text-sm flex items-center justify-center gap-1.5 disabled:opacity-40 transition-all active:scale-[0.99] shadow-lg shadow-purple-brand/10"
             >
               {isGeneratingFixture ? (
                 <>
@@ -1350,16 +1350,16 @@ export default function TournamentEdit() {
             {/* Generated Matches list */}
             <div className="flex flex-col gap-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
-                <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
+                <h4 className="text-sm font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
                   Calendario Programado ({matches.length} partidos)
                 </h4>
                 {matches.length > 0 && courts > 1 && (
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-zinc-400 font-bold uppercase">Cancha:</span>
+                    <span className="text-xs text-zinc-400 font-bold uppercase">Cancha:</span>
                     <select
                       value={selectedCourtFilter}
                       onChange={(e) => setSelectedCourtFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-                      className="px-2 py-1 bg-zinc-900 border border-zinc-805 rounded-lg text-[10px] font-bold text-zinc-300 focus:outline-none focus:border-orange-brand"
+                      className="px-2 py-1 bg-zinc-900 border border-zinc-805 rounded-lg text-xs font-bold text-zinc-300 focus:outline-none focus:border-orange-brand"
                     >
                       <option value="all">Todas</option>
                       {Array.from({ length: courts }).map((_, idx) => (
@@ -1385,7 +1385,7 @@ export default function TournamentEdit() {
                     
                     if (filteredMatches.length === 0) {
                       return (
-                        <div className="p-6 border border-zinc-900 border-dashed rounded-2xl text-center text-zinc-650 text-[11px] italic">
+                        <div className="p-6 border border-zinc-900 border-dashed rounded-2xl text-center text-zinc-650 text-xs italic">
                           No hay partidos programados en la Cancha {selectedCourtFilter}
                         </div>
                       );
@@ -1394,19 +1394,19 @@ export default function TournamentEdit() {
                     return filteredMatches.map((m) => (
                       <div key={m.id} className="p-3 bg-zinc-950 border border-zinc-900 rounded-xl flex items-center justify-between text-left">
                         <div className="flex flex-col gap-0.5">
-                          <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wide">
+                          <span className="text-2xs font-bold text-gray-500 uppercase tracking-wide">
                             Ronda {m.round} {m.group_name ? `• ${m.group_name}` : ''}
                           </span>
-                          <h5 className="font-semibold text-xs text-zinc-200">
+                          <h5 className="font-semibold text-sm text-zinc-200">
                             {m.team1?.name || 'Equipo 1'} vs {m.team2?.name || 'Equipo 2'}
                           </h5>
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                          <span className="text-[9px] font-bold font-mono bg-zinc-900 px-2 py-1 rounded text-zinc-400">
+                          <span className="text-2xs font-bold font-mono bg-zinc-900 px-2 py-1 rounded text-zinc-400">
                             Cancha {m.court}
                           </span>
                           {m.scheduled_time && (
-                            <span className="text-[9px] font-bold font-mono text-orange-brand flex items-center gap-1">
+                            <span className="text-2xs font-bold font-mono text-orange-brand flex items-center gap-1">
                               🕒 {new Date(m.scheduled_time).toLocaleDateString('es-ES', {
                                 day: 'numeric',
                                 month: 'short',
@@ -1435,12 +1435,12 @@ export default function TournamentEdit() {
               <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
                 <div>
                   <h4 className="text-sm font-extrabold text-zinc-200">Invitación de Administradores</h4>
-                  <p className="text-[10px] text-zinc-500">Pueden editar reglas, equipos y marcadores.</p>
+                  <p className="text-xs text-zinc-500">Pueden editar reglas, equipos y marcadores.</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => toggleInviteLink('admin')}
-                  className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all ${
                     inviteAdminActive
                       ? 'bg-emerald-500/10 text-emerald-450 border border-emerald-500/20'
                       : 'bg-zinc-900 text-zinc-500 border border-zinc-800'
@@ -1452,7 +1452,7 @@ export default function TournamentEdit() {
 
               {inviteAdminActive ? (
                 <div className="flex flex-col gap-2 mt-1">
-                  <span className="text-[10px] text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
+                  <span className="text-xs text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
                     {`${window.location.origin}/admin/login?join=admin&tournamentId=${id}`}
                   </span>
                   <button
@@ -1464,7 +1464,7 @@ export default function TournamentEdit() {
                   </button>
                 </div>
               ) : (
-                <p className="text-[11px] text-zinc-500 text-center py-2 italic">
+                <p className="text-2xs text-zinc-500 text-center py-2 italic">
                   Habilita el enlace para que otros puedan unirse como Administradores.
                 </p>
               )}
@@ -1475,12 +1475,12 @@ export default function TournamentEdit() {
               <div className="flex items-center justify-between border-b border-zinc-900 pb-2.5">
                 <div>
                   <h4 className="text-sm font-extrabold text-zinc-200">Invitación de Árbitros</h4>
-                  <p className="text-[10px] text-zinc-500">Sólo pueden registrar resultados y arbitrar partidos.</p>
+                  <p className="text-xs text-zinc-500">Sólo pueden registrar resultados y arbitrar partidos.</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => toggleInviteLink('referee')}
-                  className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all ${
                     inviteRefereeActive
                       ? 'bg-emerald-500/10 text-emerald-450 border border-emerald-500/20'
                       : 'bg-zinc-900 text-zinc-500 border border-zinc-800'
@@ -1492,7 +1492,7 @@ export default function TournamentEdit() {
 
               {inviteRefereeActive ? (
                 <div className="flex flex-col gap-2 mt-1">
-                  <span className="text-[10px] text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
+                  <span className="text-xs text-zinc-400 font-mono select-all break-all p-2 bg-zinc-900/60 rounded-xl border border-zinc-850">
                     {`${window.location.origin}/admin/login?join=referee&tournamentId=${id}`}
                   </span>
                   <button
@@ -1504,7 +1504,7 @@ export default function TournamentEdit() {
                   </button>
                 </div>
               ) : (
-                <p className="text-[11px] text-zinc-500 text-center py-2 italic">
+                <p className="text-2xs text-zinc-500 text-center py-2 italic">
                   Habilita el enlace para que otros puedan unirse como Árbitros.
                 </p>
               )}
@@ -1522,7 +1522,7 @@ export default function TournamentEdit() {
                   Cargando staff...
                 </div>
               ) : collaborators.length === 0 ? (
-                <p className="text-[11px] text-zinc-500 text-center py-4 italic">
+                <p className="text-2xs text-zinc-500 text-center py-4 italic">
                   Aún no hay colaboradores en este torneo. Comparte un enlace arriba para agregarlos.
                 </p>
               ) : (
@@ -1534,7 +1534,7 @@ export default function TournamentEdit() {
                     >
                       <div className="flex flex-col gap-0.5 max-w-[70%]">
                         <span className="text-xs font-bold text-zinc-200 truncate">{collab.email}</span>
-                        <span className={`text-[9px] font-black uppercase tracking-wider font-mono ${
+                        <span className={`text-2xs font-black uppercase tracking-wider font-mono ${
                           collab.role === 'admin' ? 'text-orange-brand' : 'text-blue-400'
                         }`}>
                           {collab.role === 'admin' ? 'Administrador' : 'Árbitro'}
