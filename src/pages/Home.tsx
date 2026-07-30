@@ -8,7 +8,7 @@ export default function Home() {
   const { isInstallable, promptInstall, dismiss } = useInstallPrompt();
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-[85vh] p-4 text-white select-none">
+    <div className="flex flex-col items-center min-h-[85vh] p-4 text-white select-none gap-8 md:gap-12">
       {/* Header / Brand */}
       <div className="flex flex-col items-center mt-6 text-center">
         <h1 className="text-3xl xs:text-4xl font-black tracking-tight leading-none bg-gradient-to-r from-orange-brand to-purple-brand bg-clip-text text-transparent">
@@ -27,7 +27,7 @@ export default function Home() {
       </div>
 
       {/* Main Options */}
-      <div className="flex flex-col w-full max-w-sm md:max-w-md gap-6 md:gap-8 my-auto">
+      <div className="flex flex-col w-full max-w-sm md:max-w-md gap-6 md:gap-8 mt-4 md:mt-8">
         {/* Simple Match Button */}
         <button
           onClick={() => navigate('/match/setup')}
@@ -64,7 +64,7 @@ export default function Home() {
       </div>
 
       {/* Admin Panel Link */}
-      <div className="w-full max-w-sm md:max-w-md mt-6 md:mt-10">
+      <div className="w-full max-w-sm md:max-w-md">
         <button
           onClick={() => navigate('/admin/login')}
           className="flex items-center justify-center gap-2 w-full py-3 bg-zinc-950 border border-zinc-900 rounded-xl text-base font-semibold text-gray-400 hover:text-white hover:border-zinc-800 transition-all"
