@@ -27,7 +27,7 @@ export default function Home() {
       </div>
 
       {/* Main Options */}
-      <div className="flex flex-col w-full max-w-sm gap-6 my-auto">
+      <div className="flex flex-col w-full max-w-sm md:max-w-md gap-6 md:gap-8 my-auto">
         {/* Simple Match Button */}
         <button
           onClick={() => navigate('/match/setup')}
@@ -64,7 +64,7 @@ export default function Home() {
       </div>
 
       {/* Admin Panel Link */}
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm md:max-w-md mt-6 md:mt-10">
         <button
           onClick={() => navigate('/admin/login')}
           className="flex items-center justify-center gap-2 w-full py-3 bg-zinc-950 border border-zinc-900 rounded-xl text-base font-semibold text-gray-400 hover:text-white hover:border-zinc-800 transition-all"
