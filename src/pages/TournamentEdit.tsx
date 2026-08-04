@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuthStore } from '../store/authStore';
-import { generateRoundRobin, generateGroupFixtures } from '../utils/fixtureGenerator';
+import { generateRoundRobin, generateGroupFixtures, validateKnockoutConfig, TIEBREAK_CRITERIA, normalizeTiebreakCriteria, DEFAULT_TIEBREAK_CRITERIA, type TiebreakCriterion } from '../utils/fixtureGenerator';
 import { 
   ArrowLeft, Settings, Users, Calendar, Plus, Trash2, 
-  ChevronRight, Play, Loader2, Save, UserPlus, X
+  ChevronRight, Play, Loader2, Save, UserPlus, X, ChevronUp, ChevronDown, RotateCcw
 } from 'lucide-react';
 import type { MatchModality } from '../types/sport';
 
@@ -60,9 +60,13 @@ export default function TournamentEdit() {
   const [regularPoints, setRegularPoints] = useState<number>(25);
   const [tiebreakPoints, setTiebreakPoints] = useState<number>(5);
   const [overtimeMode, setOvertimeMode] = useState<'con_alargue' | 'a_muerte'>('con_alargue');
-  const [format, setFormat] = useState<'league' | 'groups'>('league');
+  const [format, setFormat] = useState<'league' | 'groups' | 'groups_knockout'>('league');
   const [groupCount, setGroupCount] = useState<number>(2);
   const [groupAssignmentMode, setGroupAssignmentMode] = useState<'automatic' | 'manual'>('automatic');
+  const [qualifiersPerGroup, setQualifiersPerGroup] = useState<number>(2);
+  const [bestThirdsCount, setBestThirdsCount] = useState<number>(0);
+  const [tiebreakCriteria, setTiebreakCriteria] = useState<TiebreakCriterion[]>([...DEFAULT_TIEBREAK_CRITERIA]);
+  const [criteriaNeedsMigration, setCriteriaNeedsMigration] = useState(false);
   const [manualTeamsGroups, setManualTeamsGroups] = useState<{ [teamId: string]: string }>({});
   const [manualGroupsCourts, setManualGroupsCourts] = useState<{ [groupLetter: string]: number }>({});
   const [isSavingRules, setIsSavingRules] = useState(false);
@@ -189,6 +193,19 @@ export default function TournamentEdit() {
       setFormat(config.format || 'league');
       setGroupCount(config.groupCount || 2);
       setGroupAssignmentMode(config.groupAssignmentMode || 'automatic');
+      setQualifiersPerGroup(config.qualifiersPerGroup || 2);
+      setBestThirdsCount(config.bestThirdsCount || 0);
+
+      const storedCriteria = config.tiebreak_criteria;
+      const normalized = normalizeTiebreakCriteria(storedCriteria);
+      setTiebreakCriteria(normalized);
+      if (storedCriteria && Array.isArray(storedCriteria)) {
+        const storedSet = new Set(storedCriteria.filter((c: any) => typeof c === 'string'));
+        const normalizedSet = new Set(normalized);
+        setCriteriaNeedsMigration(storedSet.size !== normalizedSet.size ||
+          ![...normalizedSet].every(c => storedSet.has(c)));
+      }
+
       setManualTeamsGroups(config.manualTeamsGroups || {});
       setManualGroupsCourts(config.manualGroupsCourts || {});
 
@@ -332,10 +349,12 @@ export default function TournamentEdit() {
         format,
         groupCount,
         groupAssignmentMode,
+        qualifiersPerGroup,
+        bestThirdsCount,
         manualTeamsGroups,
         manualGroupsCourts,
         scoring: { win_2_0: 3, win_2_1: 2, loss_2_1: 1, loss_2_0: 0 },
-        tiebreak_criteria: ['point_diff', 'set_ratio', 'point_ratio', 'head_to_head']
+        tiebreak_criteria: tiebreakCriteria,
       };
 
       const { error } = await supabase
@@ -524,7 +543,7 @@ export default function TournamentEdit() {
       return;
     }
 
-    if (format === 'groups' && teams.length < groupCount * 2) {
+    if ((format === 'groups' || format === 'groups_knockout') && teams.length < groupCount * 2) {
       alert(`Para grupos necesitas al menos ${groupCount * 2} equipos (mínimo 2 por grupo).`);
       return;
     }
@@ -631,10 +650,12 @@ export default function TournamentEdit() {
           format,
           groupCount,
           groupAssignmentMode,
+          qualifiersPerGroup,
+          bestThirdsCount,
           manualTeamsGroups,
           manualGroupsCourts,
           scoring: { win_2_0: 3, win_2_1: 2, loss_2_1: 1, loss_2_0: 0 },
-          tiebreak_criteria: ['point_diff', 'set_ratio', 'point_ratio', 'head_to_head']
+          tiebreak_criteria: tiebreakCriteria,
         };
 
         const { error: tConfigErr } = await supabase
@@ -688,10 +709,12 @@ export default function TournamentEdit() {
         format,
         groupCount,
         groupAssignmentMode,
+        qualifiersPerGroup,
+        bestThirdsCount,
         manualTeamsGroups,
         manualGroupsCourts,
         scoring: { win_2_0: 3, win_2_1: 2, loss_2_1: 1, loss_2_0: 0 },
-        tiebreak_criteria: ['point_diff', 'set_ratio', 'point_ratio', 'head_to_head']
+        tiebreak_criteria: tiebreakCriteria,
       };
 
       const { error } = await supabase
@@ -927,6 +950,126 @@ export default function TournamentEdit() {
               </div>
             </div>
 
+            {/* Tiebreak criteria reorder section */}
+            <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-2xl flex flex-col gap-4">
+              <h3 className="text-base font-extrabold text-zinc-300 border-b border-zinc-900 pb-2">Criterios de Desempate</h3>
+
+              {criteriaNeedsMigration && (
+                <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start gap-2">
+                  <span className="text-amber-400 text-xs flex-shrink-0">⚠️</span>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs font-bold text-amber-400">Configuración de desempate actualizada</span>
+                    <span className="text-xs text-amber-300/70">Los criterios se han adaptado al nuevo formato. Revisa el orden y guarda los cambios.</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTiebreakCriteria([...DEFAULT_TIEBREAK_CRITERIA]);
+                        setCriteriaNeedsMigration(false);
+                      }}
+                      className="self-start px-2.5 py-1 bg-zinc-900 border border-amber-500/30 rounded-lg text-xs font-bold text-amber-400 hover:bg-zinc-800 flex items-center gap-1"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      Usar orden por defecto
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col gap-1.5">
+                {tiebreakCriteria.map((criterion, index) => {
+                  const meta = TIEBREAK_CRITERIA.find(c => c.key === criterion);
+                  const isFixed = !meta?.removable;
+
+                  return (
+                    <div
+                      key={criterion}
+                      className={`flex items-center gap-2 p-2.5 rounded-xl border transition-all ${
+                        isFixed
+                          ? 'bg-zinc-950 border-zinc-800/60'
+                          : 'bg-zinc-900/40 border-zinc-850 hover:border-zinc-700'
+                      }`}
+                    >
+                      <span className="w-5 text-center text-2xs font-mono font-bold text-zinc-550">
+                        {index + 1}
+                      </span>
+                      <div className="flex flex-col flex-grow min-w-0">
+                        <span className="text-xs font-bold text-zinc-300 truncate">{meta?.label || criterion}</span>
+                        <span className="text-2xs text-zinc-550 truncate">{meta?.description || ''}</span>
+                      </div>
+
+                      {!isFixed && (
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          <button
+                            type="button"
+                            disabled={index <= 1}
+                            onClick={() => {
+                              const next = [...tiebreakCriteria];
+                              [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                              setTiebreakCriteria(next);
+                            }}
+                            className="p-1 rounded-md text-zinc-500 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed"
+                          >
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index >= tiebreakCriteria.length - 2}
+                            onClick={() => {
+                              const next = [...tiebreakCriteria];
+                              [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                              setTiebreakCriteria(next);
+                            }}
+                            className="p-1 rounded-md text-zinc-500 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed"
+                          >
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTiebreakCriteria(tiebreakCriteria.filter(c => c !== criterion));
+                            }}
+                            className="p-1 rounded-md text-zinc-550 hover:text-red-400"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+
+                      {isFixed && (
+                        <span className="text-2xs font-bold uppercase tracking-wider text-zinc-650 px-1.5 py-0.5 bg-zinc-900 rounded-md">Fijo</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Add criterion dropdown */}
+              {(() => {
+                const inUse = new Set(tiebreakCriteria);
+                const available = TIEBREAK_CRITERIA.filter(c => c.removable && !inUse.has(c.key));
+                if (available.length === 0) return null;
+                return (
+                  <div className="flex flex-wrap gap-1.5">
+                    {available.map(c => (
+                      <button
+                        key={c.key}
+                        type="button"
+                        onClick={() => {
+                          const next = [...tiebreakCriteria];
+                          next.splice(next.length - 1, 0, c.key);
+                          setTiebreakCriteria(next);
+                        }}
+                        className="px-2 py-1 bg-zinc-900/60 border border-zinc-800 rounded-lg text-2xs font-bold text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 flex items-center gap-1 transition-all"
+                      >
+                        <Plus className="w-2.5 h-2.5" />
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+
             <button
               onClick={handleSaveRules}
               disabled={isSavingRules}
@@ -1074,7 +1217,7 @@ export default function TournamentEdit() {
               {/* Tournament Format */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm text-gray-400">Formato del Torneo</label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setFormat('league')}
@@ -1084,7 +1227,7 @@ export default function TournamentEdit() {
                         : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
                     }`}
                   >
-                    Liga (Todos contra todos)
+                    Liga
                   </button>
                   <button
                     type="button"
@@ -1097,11 +1240,22 @@ export default function TournamentEdit() {
                   >
                     Fase de Grupos
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormat('groups_knockout')}
+                      className={`py-2 text-sm font-bold rounded-lg border transition-all ${
+                      format === 'groups_knockout'
+                        ? 'bg-zinc-900 border-zinc-300 text-zinc-200'
+                        : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
+                    }`}
+                  >
+                    Grupos + Eliminatorias
+                  </button>
                 </div>
               </div>
 
               {/* Group selection */}
-              {format === 'groups' && (
+              {(format === 'groups' || format === 'groups_knockout') && (
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm text-gray-400">Cantidad de Grupos</label>
                   <select
@@ -1115,6 +1269,68 @@ export default function TournamentEdit() {
                     <option value={5}>5 Grupos</option>
                     <option value={6}>6 Grupos</option>
                   </select>
+                </div>
+              )}
+
+              {/* Knockout qualification config */}
+              {format === 'groups_knockout' && (
+                <div className="flex flex-col gap-3 border-t border-zinc-900 pt-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm text-gray-400">Equipos que clasifican por grupo</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[1, 2, 3].map(n => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setQualifiersPerGroup(n)}
+                          className={`py-2 text-sm font-bold rounded-lg border transition-all ${
+                            qualifiersPerGroup === n
+                              ? 'bg-zinc-900 border-purple-brand text-purple-brand'
+                              : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
+                          }`}
+                        >
+                          {n === 1 ? '1ro' : n === 2 ? '1ro y 2do' : '1ro, 2do y 3ro'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm text-gray-400">Mejores Terceros que avanzan</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(() => {
+                        const validThirds = groupCount <= 3 ? [0, 2] : groupCount <= 4 ? [0, 2, 4] : [0, 2, 4, 6];
+                        return validThirds.map(n => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => setBestThirdsCount(n)}
+                            className={`py-2 text-sm font-bold rounded-lg border transition-all ${
+                              bestThirdsCount === n
+                                ? 'bg-zinc-900 border-amber-400 text-amber-400'
+                                : 'bg-zinc-900/40 border-zinc-900 text-gray-500'
+                            }`}
+                          >
+                            {n === 0 ? 'Ninguno' : `${n} mejor${n > 2 ? 'es' : ''} 3ro`}
+                          </button>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Validation feedback */}
+                  {(() => {
+                    const validation = validateKnockoutConfig(groupCount, qualifiersPerGroup, bestThirdsCount);
+                    return (
+                      <div className={`p-2.5 rounded-xl border text-xs font-semibold ${
+                        validation.valid
+                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                          : 'bg-red-500/10 border-red-500/20 text-red-400'
+                      }`}>
+                        {validation.valid ? `✓ ${validation.message} (${validation.totalQualified} equipos)` : `⚠️ ${validation.message}`}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
@@ -1146,7 +1362,7 @@ export default function TournamentEdit() {
             </div>
 
             {/* Group Assignment Mode Selector */}
-            {format === 'groups' && teams.length >= 2 && (
+            {(format === 'groups' || format === 'groups_knockout') && teams.length >= 2 && (
               <div className="flex flex-col gap-1.5 p-4 bg-zinc-950 border border-zinc-900 rounded-2xl">
                 <label className="text-sm text-gray-400">Distribución de Grupos</label>
                 <div className="grid grid-cols-2 gap-2">

@@ -3,8 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuthStore } from '../store/authStore';
 import { 
-  ArrowLeft, Trophy, Calendar, Users, Loader2, Play, Activity, CheckCircle, UserPlus, Trash2
+  ArrowLeft, Trophy, Calendar, Users, Loader2, Play, Activity, CheckCircle, UserPlus, Trash2, Sword, AlertTriangle
 } from 'lucide-react';
+import MatchDetailModal from './MatchDetailModal';
+import { 
+  generateKnockoutBracket, generateNextKnockoutRound, buildKnockoutQualifiers, calculateBestThirds,
+  sortWithTiebreaks, normalizeTiebreakCriteria, DEFAULT_TIEBREAK_CRITERIA,
+  type KnockoutQualifier, type StandingRowSimple, type StandingRowLike, type TiebreakCriterion, type MatchRef
+} from '../utils/fixtureGenerator';
 
 interface Team {
   id: string;
@@ -27,6 +33,7 @@ interface Match {
   group_name?: string;
   scheduled_time?: string;
   score_json?: any;
+  match_type?: string;
   team1?: { name: string };
   team2?: { name: string };
 }
@@ -49,12 +56,15 @@ export default function TournamentPlay() {
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuthStore();
 
-  const [activeTab, setActiveTab] = useState<'matches' | 'standings' | 'teams' | 'staff'>('matches');
+  const [activeTab, setActiveTab] = useState<'matches' | 'standings' | 'bracket' | 'teams' | 'staff'>('matches');
   const [loading, setLoading] = useState(true);
   const [tournamentName, setTournamentName] = useState('');
   const [status, setStatus] = useState<'draft' | 'active' | 'finished'>('active');
-  const [format, setFormat] = useState<'league' | 'groups'>('league');
+  const [format, setFormat] = useState<'league' | 'groups' | 'groups_knockout'>('league');
   const [groupCount, setGroupCount] = useState<number>(2);
+  const [qualifiersPerGroup, setQualifiersPerGroup] = useState<number>(2);
+  const [bestThirdsCount, setBestThirdsCount] = useState<number>(0);
+  const [tiebreakCriteria, setTiebreakCriteriaState] = useState<TiebreakCriterion[]>([...DEFAULT_TIEBREAK_CRITERIA]);
   const [courts, setCourts] = useState<number>(1);
   const [selectedCourtFilter, setSelectedCourtFilter] = useState<number | 'all'>('all');
   const [teams, setTeams] = useState<Team[]>([]);
@@ -62,6 +72,10 @@ export default function TournamentPlay() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [standings, setStandings] = useState<StandingRow[]>([]);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [generatingBracket, setGeneratingBracket] = useState(false);
+  const [bracketGenerated, setBracketGenerated] = useState(false);
+  const [qualifiersList, setQualifiersList] = useState<KnockoutQualifier[]>([]);
 
   const [configJson, setConfigJson] = useState<any>({});
 
@@ -142,6 +156,9 @@ export default function TournamentPlay() {
       setInviteRefereeActive(!!config.public_invite_referee);
       setFormat(config.format || 'league');
       setGroupCount(config.groupCount || 2);
+      setQualifiersPerGroup(config.qualifiersPerGroup || 2);
+      setBestThirdsCount(config.bestThirdsCount || 0);
+      setTiebreakCriteriaState(normalizeTiebreakCriteria(config.tiebreak_criteria));
       setCourts(config.courts || 1);
 
       // 2. Get Teams
@@ -298,7 +315,7 @@ export default function TournamentPlay() {
     });
 
     matchesList.forEach(m => {
-      if (m.status !== 'finished' || !stats[m.team1_id] || !stats[m.team2_id]) return;
+      if (m.status !== 'finished' || !stats[m.team1_id] || !stats[m.team2_id] || m.match_type === 'knockout') return;
 
       const team1 = stats[m.team1_id];
       const team2 = stats[m.team2_id];
@@ -358,20 +375,11 @@ export default function TournamentPlay() {
       }
     });
 
-    const standingsArray = Object.values(stats).sort((a, b) => {
-      if (b.points !== a.points) return b.points - a.points;
-      if (b.won !== a.won) return b.won - a.won;
-      
-      const ratioA = a.setsLost === 0 ? a.setsWon * 1000 : a.setsWon / a.setsLost;
-      const ratioB = b.setsLost === 0 ? b.setsWon * 1000 : b.setsWon / b.setsLost;
-      if (ratioB !== ratioA) return ratioB - ratioA;
-
-      const pRatioA = a.pointsLost === 0 ? a.pointsWon * 1000 : a.pointsWon / a.pointsLost;
-      const pRatioB = b.pointsLost === 0 ? b.pointsWon * 1000 : b.pointsWon / b.pointsLost;
-      if (pRatioB !== pRatioA) return pRatioB - pRatioA;
-
-      return a.teamName.localeCompare(b.teamName);
-    });
+    const standingsArray = sortWithTiebreaks<StandingRowLike>(
+      Object.values(stats),
+      tiebreakCriteria,
+      matchesList.filter(m => m.status === 'finished') as MatchRef[]
+    ) as StandingRow[];
 
     setStandings(standingsArray);
   };
@@ -398,19 +406,315 @@ export default function TournamentPlay() {
     }
   };
 
-  if (loading || authLoading) {
+  const handleGenerateBracket = async () => {
+    if (!id || format !== 'groups_knockout') return;
+
+    setGeneratingBracket(true);
+    try {
+      const alph = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const groupStandingsMap = new Map<string, StandingRowSimple[]>();
+      const groupMatches = matches.filter(m => m.match_type === 'group' || !m.match_type);
+      const groupLetters = new Set<string>();
+
+      groupMatches.forEach(m => {
+        if (m.group_name) {
+          groupLetters.add(m.group_name.replace('Grupo ', '').trim());
+        }
+      });
+
+      if (groupLetters.size === 0) {
+        for (let i = 0; i < groupCount; i++) {
+          groupLetters.add(alph[i]);
+        }
+      }
+
+      const sortedGroupLetters = Array.from(groupLetters).sort();
+
+      // Build sorted standings per group
+      const standingsByGroup: { [group: string]: any[] } = {};
+
+      sortedGroupLetters.forEach(letter => {
+        const letterGroupMatches = groupMatches.filter(m =>
+          m.group_name === `Grupo ${letter}`
+        );
+        const letterGroupTeamIds = new Set<string>();
+        letterGroupMatches.forEach(m => {
+          letterGroupTeamIds.add(m.team1_id);
+          letterGroupTeamIds.add(m.team2_id);
+        });
+
+        const letterGroupStandings = standings.filter(s => letterGroupTeamIds.has(s.teamId));
+        standingsByGroup[letter] = letterGroupStandings;
+      });
+
+      // Build StandingRowSimple for each group
+      sortedGroupLetters.forEach(letter => {
+        const rows = standingsByGroup[letter] || [];
+        groupStandingsMap.set(letter, rows.map((r: any) => ({
+          teamId: r.teamId,
+          teamName: r.teamName,
+          points: r.points,
+          setsWon: r.setsWon,
+          setsLost: r.setsLost,
+          pointsWon: r.pointsWon,
+          pointsLost: r.pointsLost,
+        })));
+      });
+
+      // Build qualifiers lists
+      const groupWinners: KnockoutQualifier[] = [];
+      const groupRunnersUp: KnockoutQualifier[] = [];
+      const groupThirds: KnockoutQualifier[] = [];
+
+      sortedGroupLetters.forEach(letter => {
+        const rows = standingsByGroup[letter] || [];
+        if (rows.length >= 1) {
+          const r = rows[0];
+          groupWinners.push({ teamId: r.teamId, teamName: r.teamName, label: `1ro Grupo ${letter}` });
+        }
+        if (qualifiersPerGroup >= 2 && rows.length >= 2) {
+          const r = rows[1];
+          groupRunnersUp.push({ teamId: r.teamId, teamName: r.teamName, label: `2do Grupo ${letter}` });
+        }
+        if (qualifiersPerGroup >= 3 && rows.length >= 3) {
+          const r = rows[2];
+          groupThirds.push({ teamId: r.teamId, teamName: r.teamName, label: `3ro Grupo ${letter}` });
+        }
+      });
+
+      // Calculate best thirds
+      const bestThirds = calculateBestThirds(groupStandingsMap, bestThirdsCount, tiebreakCriteria, groupMatches.filter(m => m.status === 'finished') as MatchRef[]);
+
+      // Build the final qualifiers order (interleaved)
+      const qualifiers = buildKnockoutQualifiers(groupWinners, groupRunnersUp, groupThirds, bestThirds);
+      setQualifiersList(qualifiers);
+
+      const totalRounds = Math.log2(qualifiers.length);
+
+      // Generate first knockout round
+      const knockoutMatches = generateKnockoutBracket(qualifiers, id, courts, totalRounds);
+
+      // Assign scheduled times consecutively
+      if (knockoutMatches.length > 0) {
+        const getMatchDuration = (pts: number): number => {
+          if (pts <= 9) return 15;
+          if (pts <= 11) return 20;
+          if (pts <= 15) return 25;
+          if (pts <= 21) return 30;
+          return 35;
+        };
+        const durationMinutes = getMatchDuration(configJson.regularPoints || 25);
+        const baseDate = new Date();
+        baseDate.setHours(baseDate.getHours() + 1);
+        const courtNextTime: { [court: number]: Date } = {};
+        for (let c = 1; c <= courts; c++) {
+          courtNextTime[c] = new Date(baseDate);
+        }
+
+        knockoutMatches.forEach((match) => {
+          const court = match.court || 1;
+          const matchTime = new Date(courtNextTime[court]);
+          match.scheduled_time = matchTime.toISOString();
+          courtNextTime[court] = new Date(matchTime.getTime() + durationMinutes * 60000);
+        });
+
+        const { error: insErr } = await supabase
+          .from('matches')
+          .insert(knockoutMatches);
+
+        if (insErr) throw insErr;
+      }
+
+      setBracketGenerated(true);
+      await fetchTournamentData();
+      alert('¡Llaves de eliminación generadas con éxito!');
+    } catch (e) {
+      console.error('Error generating bracket:', e);
+      alert('Error al generar las llaves de eliminación.');
+    } finally {
+      setGeneratingBracket(false);
+    }
+  };
+
+  const canGenerateBracket = (): boolean => {
+    if (format !== 'groups_knockout') return false;
+    if (bracketGenerated) return false;
+    const groupMatches = matches.filter(m => m.match_type === 'group' || !m.match_type);
+    if (groupMatches.length === 0) return false;
+    return groupMatches.every(m => m.status === 'finished');
+  };
+
+  const handleAdvanceToNextRound = async () => {
+    if (!id) return;
+
+    const knockoutMatches = matches.filter(m => m.match_type === 'knockout');
+    if (knockoutMatches.length === 0) return;
+
+    const maxRound = Math.max(...knockoutMatches.map(m => m.round));
+    const totalRounds = Math.log2(qualifiersList.length);
+
+    if (maxRound >= totalRounds) return;
+
+    const currentRoundMatches = knockoutMatches.filter(m => m.round === maxRound);
+    const allCurrentDone = currentRoundMatches.every(m => m.status === 'finished');
+
+    if (!allCurrentDone) {
+      alert('Todos los partidos de la ronda actual deben estar finalizados para avanzar.');
+      return;
+    }
+
+    // Check if next round already exists
+    const nextRoundMatches = knockoutMatches.filter(m => m.round === maxRound + 1);
+    if (nextRoundMatches.length > 0) return;
+
+    try {
+      const nextMatches = generateNextKnockoutRound(id, currentRoundMatches, courts, totalRounds, maxRound + 1);
+
+      if (nextMatches.length > 0) {
+        const { error } = await supabase
+          .from('matches')
+          .insert(nextMatches);
+
+        if (error) throw error;
+        await fetchTournamentData();
+        alert('¡Siguiente ronda generada con éxito!');
+      }
+    } catch (e) {
+      console.error('Error advancing to next round:', e);
+      alert('Error al generar la siguiente ronda.');
+    }
+  };
+
+  const canAdvanceRound = (): boolean => {
+    const knockoutMatches = matches.filter(m => m.match_type === 'knockout');
+    if (knockoutMatches.length === 0) return false;
+
+    const maxRound = Math.max(...knockoutMatches.map(m => m.round));
+    const totalRounds = Math.log2(qualifiersList.length);
+
+    if (maxRound >= totalRounds) return false;
+
+    const currentRoundMatches = knockoutMatches.filter(m => m.round === maxRound);
+    const allDone = currentRoundMatches.length > 0 && currentRoundMatches.every(m => m.status === 'finished');
+
+    const nextRoundExists = knockoutMatches.some(m => m.round === maxRound + 1);
+    return allDone && !nextRoundExists;
+  };
+
+  const renderBracket = () => {
+    const knockoutMatches = matches.filter(m => m.match_type === 'knockout');
+    if (knockoutMatches.length === 0) return null;
+
+    const maxRound = Math.max(...knockoutMatches.map(m => m.round));
+    const totalRounds = Math.log2(qualifiersList.length);
+    const rounds: number[] = [];
+    for (let i = 1; i <= maxRound; i++) rounds.push(i);
+
+    const roundNames: { [r: number]: string } = {};
+    const totalT = totalRounds || maxRound;
+    rounds.forEach(r => {
+      const idx = totalT - r + 1;
+      const names = ['', 'Final', 'Semifinales', 'Cuartos', 'Octavos'];
+      roundNames[r] = names[idx] || `Ronda ${r}`;
+    });
+
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-white font-sans">
-        <Loader2 className="w-6 h-6 animate-spin text-orange-brand" />
+      <div className="flex flex-col gap-5">
+        {rounds.map(round => {
+          const roundMatches = knockoutMatches.filter(m => m.round === round).sort((a, b) => a.id.localeCompare(b.id));
+          if (roundMatches.length === 0) return null;
+
+          const isLastRound = round === totalRounds;
+
+          return (
+            <div key={round} className="flex flex-col gap-2">
+              <h4 className={`text-xs font-black uppercase tracking-wider border-b border-zinc-900 pb-2 ${
+                isLastRound ? 'text-amber-400' : round === 1 ? 'text-orange-brand' : 'text-purple-brand'
+              }`}>
+                {roundNames[round]}
+              </h4>
+              <div className="flex flex-col gap-2">
+                {roundMatches.map((m) => {
+                  const score = m.score_json || {};
+                  const isDone = m.status === 'finished';
+                  const t1Name = m.team1?.name || 'Por definir';
+                  const t2Name = m.team2?.name || 'Por definir';
+                  const isLive = m.status === 'in_progress';
+                  const isPending = m.status === 'pending';
+
+                  return (
+                    <div
+                      key={m.id}
+                      onClick={() => setSelectedMatch(m)}
+                      className={`p-3 border rounded-xl flex flex-col gap-2 cursor-pointer transition-all ${
+                        isLive
+                          ? 'bg-zinc-950 border-orange-brand/50 shadow-md'
+                          : isDone
+                          ? 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-700'
+                          : 'bg-zinc-950/20 border-zinc-900/60 border-dashed hover:border-zinc-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-2xs font-bold text-zinc-600 uppercase">
+                        <span>Cancha {m.court}</span>
+                        {isLive ? (
+                          <span className="text-red-500 animate-pulse">En Arbitraje</span>
+                        ) : isDone ? (
+                          <span className="text-zinc-500">Finalizado</span>
+                        ) : (
+                          <span className="text-zinc-600">Pendiente</span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-extrabold truncate max-w-[120px] ${
+                          isDone && score.winner_id === m.team1_id ? 'text-orange-brand' : isPending ? 'text-zinc-600' : 'text-zinc-200'
+                        }`}>
+                          {t1Name}
+                        </span>
+                        {!isPending && (
+                          <span className="text-sm font-mono text-zinc-400">
+                            {(score.sets_won || {}).team1 ?? 0}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-extrabold truncate max-w-[120px] ${
+                          isDone && score.winner_id === m.team2_id ? 'text-purple-brand' : isPending ? 'text-zinc-600' : 'text-zinc-200'
+                        }`}>
+                          {t2Name}
+                        </span>
+                        {!isPending && (
+                          <span className="text-sm font-mono text-zinc-400">
+                            {(score.sets_won || {}).team2 ?? 0}
+                          </span>
+                        )}
+                      </div>
+                      {isLive && status === 'active' && m.status !== 'finished' && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/admin/match/referee/${m.id}`);
+                          }}
+                          className="mt-1 py-2 bg-zinc-900 border border-zinc-800 hover:border-orange-brand/50 text-white font-extrabold rounded-xl text-xs uppercase flex items-center justify-center gap-1"
+                        >
+                          <Play className="w-2.5 h-2.5 fill-current text-orange-brand" />
+                          Arbitrar
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
-  }
+  };
 
-  const renderGroupsStandings = () => {
+  const renderStandingsWithBadges = () => {
     const alph = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const groups: { [key: string]: StandingRow[] } = {};
-    
-    // Find all group letters dynamically from matches
+    const groups: { [key: string]: any[] } = {};
+
     const groupLetters = new Set<string>();
     matches.forEach(m => {
       if (m.group_name) {
@@ -426,11 +730,8 @@ export default function TournamentPlay() {
     }
 
     const sortedLetters = Array.from(groupLetters).sort();
-    sortedLetters.forEach(letter => {
-      groups[letter] = [];
-    });
+    sortedLetters.forEach(letter => { groups[letter] = []; });
 
-    // Assign team rows to groups based on matches played
     standings.forEach(row => {
       const teamMatch = matches.find(m => (m.team1_id === row.teamId || m.team2_id === row.teamId) && m.group_name);
       const groupLetter = teamMatch && teamMatch.group_name
@@ -441,6 +742,23 @@ export default function TournamentPlay() {
         groups[groupLetter].push(row);
       }
     });
+
+    const isKnockout = format === 'groups_knockout';
+    const bestThirdIds = new Set<string>();
+
+    if (isKnockout && bestThirdsCount > 0) {
+      const groupStandingsMap = new Map<string, StandingRowSimple[]>();
+      sortedLetters.forEach(letter => {
+        groupStandingsMap.set(letter, (groups[letter] || []).map((r: any) => ({
+          teamId: r.teamId, teamName: r.teamName,
+          points: r.points, setsWon: r.setsWon, setsLost: r.setsLost,
+          pointsWon: r.pointsWon, pointsLost: r.pointsLost,
+        })));
+      });
+      const bt = calculateBestThirds(groupStandingsMap, bestThirdsCount, tiebreakCriteria,
+        matches.filter(m => m.status === 'finished' && m.match_type !== 'knockout') as MatchRef[]);
+      bt.forEach(t => bestThirdIds.add(t.teamId));
+    }
 
     return Object.entries(groups).map(([letter, groupRows]) => (
       <div key={letter} className="flex flex-col gap-3 p-4 bg-zinc-950 border border-zinc-900 rounded-3xl">
@@ -464,10 +782,30 @@ export default function TournamentPlay() {
             <tbody>
               {groupRows.map((row, idx) => {
                 const diff = row.pointsWon - row.pointsLost;
+                let badge: string | null = null;
+
+                if (isKnockout) {
+                  if (idx < qualifiersPerGroup) {
+                    badge = '✓ Clasificado';
+                  } else if (idx === 2 && bestThirdIds.has(row.teamId)) {
+                    badge = '⭐ Mejor 3ro';
+                  }
+                }
+
                 return (
                   <tr key={row.teamId} className="border-b border-zinc-900/40 last:border-0 hover:bg-zinc-900/10">
                     <td className="py-2.5 pl-1 font-bold text-zinc-200 truncate max-w-[100px] text-sm">
-                      {idx + 1}. {row.teamName}
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-zinc-500">{idx + 1}.</span>
+                        <span>{row.teamName}</span>
+                        {badge && (
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
+                            badge.startsWith('✓') ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
+                          }`}>
+                            {badge}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-2.5 text-center font-black text-orange-brand text-base">{row.points}</td>
                     <td className="py-2.5 text-center text-zinc-450 text-sm">{row.played}</td>
@@ -487,6 +825,14 @@ export default function TournamentPlay() {
       </div>
     ));
   };
+
+  if (loading || authLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white font-sans">
+        <Loader2 className="w-6 h-6 animate-spin text-orange-brand" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white p-4 font-sans select-none relative pb-10">
@@ -525,7 +871,7 @@ export default function TournamentPlay() {
       </div>
 
       {/* Tabs */}
-      <div className={`grid ${userRole === 'creator' ? 'grid-cols-4' : 'grid-cols-3'} p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-sm mx-auto w-full`}>
+      <div className={`grid ${userRole === 'creator' ? 'grid-cols-5' : 'grid-cols-4'} p-1 bg-zinc-900/60 border border-zinc-850 rounded-2xl mb-6 max-w-lg mx-auto w-full`}>
         <button
           onClick={() => setActiveTab('matches')}
           className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
@@ -543,6 +889,15 @@ export default function TournamentPlay() {
         >
           <Trophy className="w-3.5 h-3.5" />
           Posiciones
+        </button>
+        <button
+          onClick={() => setActiveTab('bracket')}
+          className={`py-2.5 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all ${
+            activeTab === 'bracket' ? 'bg-zinc-800 text-amber-400' : 'text-gray-400'
+          }`}
+        >
+          <Sword className="w-3.5 h-3.5" />
+          Llave
         </button>
         <button
           onClick={() => setActiveTab('teams')}
@@ -669,10 +1024,11 @@ export default function TournamentPlay() {
                     return (
                       <div
                         key={m.id}
-                        className={`p-4 border rounded-2xl flex flex-col gap-3 mb-3 ${
+                        onClick={() => setSelectedMatch(m)}
+                        className={`p-4 border rounded-2xl flex flex-col gap-3 mb-3 cursor-pointer ${
                           m.status === 'in_progress' 
                             ? 'bg-zinc-950 border-orange-brand/50 shadow-md shadow-orange-brand/5'
-                            : 'bg-zinc-950/40 border-zinc-900'
+                            : 'bg-zinc-950/40 border-zinc-900 hover:border-zinc-700'
                         }`}
                       >
                         {/* Header line info */}
@@ -767,7 +1123,10 @@ export default function TournamentPlay() {
                         {/* Referee Action Button */}
                         {status === 'active' && m.status !== 'finished' && (
                           <button
-                            onClick={() => navigate(`/admin/match/referee/${m.id}`)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/admin/match/referee/${m.id}`);
+                            }}
                             className="mt-1 flex items-center justify-center gap-1.5 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-orange-brand/50 text-white font-extrabold rounded-xl text-base uppercase tracking-wider transition-all"
                           >
                             <Play className="w-3 h-3 fill-current text-orange-brand" />
@@ -786,8 +1145,8 @@ export default function TournamentPlay() {
         {/* TAB 2: STANDINGS */}
         {activeTab === 'standings' && (
           <div className="flex flex-col gap-4">
-            {(format === 'groups' || matches.some(m => m.group_name)) ? (
-              renderGroupsStandings()
+            {(format === 'groups' || format === 'groups_knockout' || matches.some(m => m.group_name)) ? (
+              renderStandingsWithBadges()
             ) : (
               <div className="p-4 bg-zinc-950 border border-zinc-900 rounded-3xl flex flex-col gap-3">
                 <h4 className="text-xs font-bold text-orange-brand uppercase border-b border-zinc-900 pb-2">
@@ -846,10 +1205,84 @@ export default function TournamentPlay() {
                 <span className="col-span-2"><strong>DP:</strong> Diferencia de Puntos (PA - PR)</span>
               </div>
             </div>
+
+            {/* Knockout generation actions */}
+            {format === 'groups_knockout' && status === 'active' && userRole !== 'referee' && (
+              <div className="flex flex-col gap-2 mt-1">
+                {canGenerateBracket() && (
+                  <button
+                    onClick={handleGenerateBracket}
+                    disabled={generatingBracket}
+                    className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-extrabold rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-40"
+                  >
+                    {generatingBracket ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Sword className="w-4 h-4" />
+                    )}
+                    Generar Llaves de Eliminatorias
+                  </button>
+                )}
+                {!canGenerateBracket() && !bracketGenerated && matches.filter(m => m.match_type === 'group' || !m.match_type).length > 0 && (
+                  <div className="p-3 bg-zinc-950/60 border border-zinc-900 rounded-xl flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="text-xs text-zinc-400">Finaliza todos los partidos de la fase de grupos para poder generar las llaves.</span>
+                  </div>
+                )}
+                {canAdvanceRound() && (
+                  <button
+                    onClick={handleAdvanceToNextRound}
+                    className="w-full py-3 bg-gradient-to-r from-purple-brand to-blue-600 text-white font-extrabold rounded-xl text-sm flex items-center justify-center gap-2"
+                  >
+                    <Play className="w-4 h-4 fill-current" />
+                    Avanzar a Siguiente Ronda
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
-        {/* TAB 3: TEAMS & ROSTERS */}
+        {/* TAB 3: BRACKET */}
+        {activeTab === 'bracket' && (
+          <div className="flex flex-col gap-4">
+            {format === 'groups_knockout' ? (
+              matches.filter(m => m.match_type === 'knockout').length > 0 ? (
+                <>
+                  {renderBracket()}
+                  {canAdvanceRound() && status === 'active' && userRole !== 'referee' && (
+                    <button
+                      onClick={handleAdvanceToNextRound}
+                      className="w-full py-3 bg-gradient-to-r from-purple-brand to-blue-600 text-white font-extrabold rounded-xl text-sm flex items-center justify-center gap-2"
+                    >
+                      <Play className="w-4 h-4 fill-current" />
+                      Avanzar a Siguiente Ronda
+                    </button>
+                  )}
+                </>
+              ) : (
+                <div className="p-8 border border-zinc-900 border-dashed rounded-3xl text-center flex flex-col items-center gap-3">
+                  <Sword className="w-8 h-8 text-zinc-700" />
+                  <p className="text-sm text-zinc-500 max-w-xs">
+                    Las llaves de eliminación se generarán automáticamente al finalizar la fase de grupos.
+                  </p>
+                  {status === 'active' && userRole !== 'referee' && (
+                    <p className="text-xs text-zinc-600">
+                      Dirígete a la pestaña <strong className="text-purple-brand">Posiciones</strong> y pulsa el botón de generar llaves.
+                    </p>
+                  )}
+                </div>
+              )
+            ) : (
+              <div className="p-8 border border-zinc-900 border-dashed rounded-3xl text-center flex flex-col items-center gap-3">
+                <Sword className="w-8 h-8 text-zinc-700" />
+                <p className="text-sm text-zinc-500">Este torneo no usa el formato de Grupos + Eliminatorias.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 4: TEAMS & ROSTERS */}
         {activeTab === 'teams' && (
           <div className="flex flex-col gap-3">
             {teams.map((t) => (
@@ -873,7 +1306,7 @@ export default function TournamentPlay() {
           </div>
         )}
 
-        {/* TAB 4: STAFF */}
+        {/* TAB 5: STAFF */}
         {activeTab === 'staff' && userRole === 'creator' && (
           <div className="flex flex-col gap-5">
             {/* Admin Invite Card */}
@@ -1002,6 +1435,23 @@ export default function TournamentPlay() {
           </div>
         )}
       </div>
+
+      {selectedMatch && (
+        <MatchDetailModal
+          match={selectedMatch}
+          tournamentId={id!}
+          tournamentName={tournamentName}
+          setsToWin={configJson.setsToWin || 2}
+          regularPoints={configJson.regularPoints || 25}
+          tiebreakPoints={configJson.tiebreakPoints || 5}
+          overtimeMode={configJson.overtimeMode || 'con_alargue'}
+          canEdit={(userRole === 'creator' || userRole === 'admin') && selectedMatch.status === 'finished'}
+          currentUserEmail={user?.email || ''}
+          onClose={() => setSelectedMatch(null)}
+          onSaved={() => fetchTournamentData()}
+          isAdminView={true}
+        />
+      )}
     </div>
   );
 }

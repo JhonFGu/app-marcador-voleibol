@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  Volume2, VolumeX, ArrowLeft, Loader2, Activity
+  Volume2, VolumeX, ArrowLeft, Loader2, Activity, Eye
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import MatchDetailModal from './MatchDetailModal';
 
 interface MatchData {
   id: string;
@@ -11,6 +12,9 @@ interface MatchData {
   team1_id: string;
   team2_id: string;
   court: number;
+  round: number;
+  group_name?: string;
+  scheduled_time?: string;
   status: 'pending' | 'in_progress' | 'finished';
   score_json?: any;
   team1?: { name: string };
@@ -25,6 +29,14 @@ export default function PublicLiveMatch() {
   const [matchData, setMatchData] = useState<MatchData | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showRotations, setShowRotations] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [tournamentConfig, setTournamentConfig] = useState<{ name: string; setsToWin: number; regularPoints: number; tiebreakPoints: number; overtimeMode: 'con_alargue' | 'a_muerte' }>({
+    name: '',
+    setsToWin: 2,
+    regularPoints: 25,
+    tiebreakPoints: 5,
+    overtimeMode: 'con_alargue',
+  });
 
   // References to track previous scores for sound trigger comparisons
   const prevScores = useRef<{ score1: number; score2: number; sets1: number; sets2: number }>({
@@ -179,6 +191,32 @@ export default function PublicLiveMatch() {
       }
     } catch (e) {
       console.warn("AudioContext failed", e);
+    }
+  };
+
+  const handleOpenDetail = async () => {
+    if (!matchData) return;
+    try {
+      const { data: tData } = await supabase
+        .from('tournaments')
+        .select('name, config_json')
+        .eq('id', matchData.tournament_id)
+        .single();
+
+      if (tData) {
+        const cfg = tData.config_json || {};
+        setTournamentConfig({
+          name: tData.name || '',
+          setsToWin: cfg.setsToWin || 2,
+          regularPoints: cfg.regularPoints || 25,
+          tiebreakPoints: cfg.tiebreakPoints || 5,
+          overtimeMode: cfg.overtimeMode || 'con_alargue',
+        });
+      }
+      setShowDetail(true);
+    } catch (e) {
+      console.error('Error fetching tournament config:', e);
+      setShowDetail(true);
     }
   };
 
@@ -404,6 +442,13 @@ export default function PublicLiveMatch() {
 
         <div className="flex items-center gap-1.5">
           <button 
+            onClick={handleOpenDetail}
+            className="px-3 py-2 bg-zinc-900 border border-zinc-850 text-xs font-bold text-zinc-450 hover:text-white rounded-xl flex items-center gap-1 transition-colors"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Detalle
+          </button>
+          <button 
             onClick={() => setShowRotations(!showRotations)}
             className={`px-3 py-2 border rounded-xl text-xs font-bold transition-all ${
               showRotations 
@@ -472,6 +517,24 @@ export default function PublicLiveMatch() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* MODAL: MATCH DETAIL */}
+      {showDetail && matchData && (
+        <MatchDetailModal
+          match={matchData}
+          tournamentId={matchData.tournament_id}
+          tournamentName={tournamentConfig.name}
+          setsToWin={tournamentConfig.setsToWin}
+          regularPoints={tournamentConfig.regularPoints}
+          tiebreakPoints={tournamentConfig.tiebreakPoints}
+          overtimeMode={tournamentConfig.overtimeMode}
+          canEdit={false}
+          currentUserEmail=""
+          onClose={() => setShowDetail(false)}
+          onSaved={() => {}}
+          isAdminView={false}
+        />
       )}
 
     </div>
